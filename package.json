@@ -12,6 +12,7 @@
     "@auth/mongodb-adapter": "^3.4.1",
     "@auth/prisma-adapter": "^2.4.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/three": "^0.182.0",
     "axios": "^1.13.4",
     "bcryptjs": "^3.0.3",
     "gsap": "^3.14.2",
