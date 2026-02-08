@@ -1,34 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, ProductStatus } from '@prisma/client';
 
 const prisma = new PrismaClient();
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-    try {
-        const { title, price, category, images, stock } = await req.json();
-        console.log(price,stock,title)
+  try {
+    const body = await req.json();
 
-        // Convert `price` to Float and `stock` to Int
-        const priceFloat = parseFloat(price);
-        const stockInt = parseInt(stock, 10);
+    const {
+      name,
+      description,
+      images,
+      productCode,
+      brandId,
+    } = body;
 
-        if (isNaN(priceFloat) || isNaN(stockInt)) {
-            return NextResponse.json({ message: 'Invalid price or stock value' }, { status: 400 });
-        }
-
-        const result = await prisma.products.create({
-            data: {
-                title,
-                price: priceFloat,
-                category,
-                stock: stockInt,
-                images,
-            },
-        });
-
-        return NextResponse.json(result, { status: 200 });
-    } catch (err: any) {
-        return NextResponse.json({ message: err.message }, { status: 500 });
+    // Basic validation
+    if (!name || !productCode || !brandId) {
+      return NextResponse.json(
+        { message: 'Missing required fields' },
+        { status: 400 }
+      );
     }
+
+    if (!Array.isArray(images)) {
+      return NextResponse.json(
+        { message: 'Images must be an array' },
+        { status: 400 }
+      );
+    }
+
+    const product = await prisma.product.create({
+      data: {
+        name,
+        description,
+        images,
+        productCode,
+        brandId,
+        status: ProductStatus.DRAFT, // default, but explicit is clearer
+      },
+    });
+
+    return NextResponse.json(product, { status: 201 });
+  } catch (err: any) {
+    // Handle unique constraint error (productCode)
+    if (err.code === 'P2002') {
+      return NextResponse.json(
+        { message: 'Product code already exists' },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: err.message || 'Something went wrong' },
+      { status: 500 }
+    );
+  }
 }

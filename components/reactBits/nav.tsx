@@ -2,7 +2,9 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import RippleButton from '../RippleButton';
-import Link from 'next/link';
+import { login } from '@/actions/auth';
+import { signOut, useSession } from 'next-auth/react';
+
 
 export interface StaggeredMenuItem {
     label: string;
@@ -381,10 +383,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         };
     }, [closeOnClickAway, open, closeMenu]);
 
+    const session = useSession()
+
+
     return (
         <div
-            className={`sm-scope z-40 ${isFixed ? 'fixed top-0 left-0 w-screen h-screen overflow-hidden' : 'w-full h-full'}`}
-        >
+            className={`sm-scope z-40 ${isFixed ? 'fixed top-0 left-0 w-screen h-screen overflow-hidden' : 'w-full h-full'}`}>
             <div
                 className={
                     (className ? className + ' ' : '') + 'staggered-menu-wrapper pointer-events-none relative w-full h-full z-40'
@@ -430,10 +434,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         />
                     </div>
                     <div>
-
-                        <Link href='/login'>
-                            <RippleButton>Login</RippleButton>
-                        </Link>
+                        {session.data ? (
+                            <RippleButton onClick={() => signOut()}>Logout</RippleButton>
+                        ) : (
+                            <RippleButton onClick={() => login("google")}>Login</RippleButton>
+                        )}
                     </div>
                     <button
                         ref={toggleBtnRef}

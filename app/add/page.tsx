@@ -1,98 +1,119 @@
 'use client';
 
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from 'react';
 
-export default function AddProduct() {
-  const [title, setTitle] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [stock, setStock] = useState("");
-  const [images, setImages] = useState("");
+export default function AddProductPage() {
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage(null);
 
-    const productData = {
-      title: title || null,
-      price: price ? Number(price) : null,
-      category: category || null,
-      stock: Number(stock),
-      images: images
-        ? images.split(",").map((img) => img.trim())
-        : [],
+    const formData = new FormData(e.currentTarget);
+
+    const payload = {
+      name: formData.get('name'),
+      description: formData.get('description'),
+      productCode: formData.get('productCode'),
+      images: (formData.get('images') as string)
+        .split(',')
+        .map((img) => img.trim()),
+      brandId: '65a1f2c9e8b2a9f1d1234567', // TODO: get from session
     };
 
     try {
-      await axios.post("/api/products/add", productData);
-      alert("Product added successfully");
+      const res = await fetch('/api/products/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
 
-      // reset form
-      setTitle("");
-      setPrice("");
-      setCategory("");
-      setStock("");
-      setImages("");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to add product");
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Something went wrong');
+      }
+
+      setMessage('✅ Product added successfully');
+      e.currentTarget.reset();
+    } catch (err: any) {
+      setMessage(`❌ ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <section className="mx-auto max-w-xl p-6">
-      <h2 className="mb-6 text-xl font-semibold">Add Product</h2>
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-2xl font-semibold mb-6">
+        Add New Product
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          placeholder="Product title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full rounded border p-2"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Product Name *
+          </label>
+          <input
+            name="name"
+            required
+            className="w-full border rounded px-3 py-2"
+            placeholder="Handcrafted Coffee Mug"
+          />
+        </div>
 
-        <input
-          type="number"
-          placeholder="Price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full rounded border p-2"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Description
+          </label>
+          <textarea
+            name="description"
+            className="w-full border rounded px-3 py-2"
+            placeholder="Tell the story of your product..."
+          />
+        </div>
 
-        <input
-          type="text"
-          placeholder="Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full rounded border p-2"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Product Code *
+          </label>
+          <input
+            name="productCode"
+            required
+            className="w-full border rounded px-3 py-2"
+            placeholder="BC-MUG-001"
+          />
+        </div>
 
-        <input
-          type="number"
-          placeholder="Stock"
-          required
-          value={stock}
-          onChange={(e) => setStock(e.target.value)}
-          className="w-full rounded border p-2"
-        />
-
-        {/* Images as comma-separated URLs */}
-        <input
-          type="text"
-          placeholder="Image URLs (comma separated)"
-          value={images}
-          onChange={(e) => setImages(e.target.value)}
-          className="w-full rounded border p-2"
-        />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Image URLs (comma separated)
+          </label>
+          <input
+            name="images"
+            className="w-full border rounded px-3 py-2"
+            placeholder="https://..., https://..."
+          />
+        </div>
 
         <button
           type="submit"
-          className="w-full rounded bg-black py-2 text-white"
+          disabled={loading}
+          className="bg-black text-white px-4 py-2 rounded disabled:opacity-50"
         >
-          Add Product
+          {loading ? 'Adding...' : 'Add Product'}
         </button>
+
+        {message && (
+          <p className="text-sm mt-2">
+            {message}
+          </p>
+        )}
       </form>
-    </section>
+    </div>
   );
 }

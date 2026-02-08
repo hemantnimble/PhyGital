@@ -34,7 +34,7 @@ function HeroSec() {
                         Immutable Proof of Authenticity
                     </span>
 
-                    <h1 className="max-w-5xl bg-gradient-to-br from-zinc-900 to-zinc-400 bg-clip-text text-[30px]  font-semibold leading-[1.1] text-transparent sm:text-6xl md:text-7xl">
+                    <h1 className="max-w-5xl text-white bg-clip-text text-[30px]  font-semibold leading-[1.1] text-transparent sm:text-6xl md:text-7xl">
                         Authenticity,
                         {/* <br className="hidden sm:block" /> */}
                         Permanently Recorded.

@@ -74,18 +74,30 @@ export const { handlers: { GET, POST }, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string
         session.user.email = token.email as string
         session.user.image = token.image as string
-        session.user.roles = token.roles || [UserRole.USER]
+        session.user.role = token.role || [UserRole.USER]
       }
       return session;
     },
     jwt: async ({ user, token }) => {
       if (user) {
         token.id = user.id || '';
-        token.name = user.name || ''; 
+        token.name = user.name || '';
         token.email = user.email || '';
-        token.image = user.image || ''; 
-        token.roles = user.roles || [UserRole.USER];
+        token.image = user.image || '';
+        token.role = user.role || [UserRole.USER];
       }
+
+      // if (token?.id) {
+      //   const dbUser = await db.user.findUnique({
+      //     where: { id: token.id },
+      //     select: { role: true },
+      //   })
+
+      //   if (dbUser) {
+      //     token.role = dbUser.role
+      //   }
+      // }
+
       return token;
     },
 
