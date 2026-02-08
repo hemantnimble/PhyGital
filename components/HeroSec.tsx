@@ -4,7 +4,7 @@ import LiquidEther from '@/components/reactBits/hero-sec';
 
 function HeroSec() {
     return (
-        <div className="relative h-screen w-full overflow-hidden">
+        <div className="relative h-screen w-full overflow-hidden -mt-20">
 
             {/* 🔹 Background Liquid Effect */}
             <div className="absolute inset-0 z-0">
