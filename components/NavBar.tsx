@@ -5,7 +5,7 @@ function NavBar() {
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
-        { label: 'User Dash', ariaLabel: 'Learn about us', link: '/dashboard/brand' },
+        { label: 'Dashboard', ariaLabel: 'Learn about us', link: '/dashboard' },
         { label: 'Admin Dash', ariaLabel: 'View our services', link: '/dashboard/admin' },
         { label: 'Contact', ariaLabel: 'Get in touch', link: '/contact' }
     ];
