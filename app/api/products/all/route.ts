@@ -182,16 +182,36 @@ export async function DELETE(req: Request) {
     )
   }
 
-  const deleted = await db.product.deleteMany({
+  // 1️⃣ Fetch product first (important)
+  const product = await db.product.findFirst({
     where: {
       id,
       brandId: brand.id,
     },
   })
 
-  if (deleted.count === 0) {
+  if (!product) {
     return NextResponse.json({ message: "Product not found" }, { status: 404 })
   }
 
+  // 2️⃣ ACTIVE → SOFT DELETE
+  if (product.status === "ACTIVE") {
+    await db.product.update({
+      where: { id: product.id },
+      data: { status: "FLAGGED" },
+    })
+
+    return NextResponse.json({
+      success: true,
+      softDeleted: true,
+    })
+  }
+
+  // 3️⃣ DRAFT → HARD DELETE
+  await db.product.delete({
+    where: { id: product.id },
+  })
+
   return NextResponse.json({ success: true })
 }
+

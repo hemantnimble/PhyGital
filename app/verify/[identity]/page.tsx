@@ -37,16 +37,34 @@ export default async function VerifyPage(
   const { product } = record
   const { brand } = product
 
-  // 🧾 Log verification (non-blocking)
+  // ❌ Product exists but is no longer active
+  if (product.status !== "ACTIVE") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-red-600">
+            Product Not Active
+          </h1>
+          <p className="text-gray-600 mt-2">
+            This product was registered but is no longer active.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+
+  // 🧾 Log verification ONLY for active products
   await db.verificationLog.create({
     data: {
       productId: product.id,
     },
   })
 
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-black text-white rounded-lg shadow max-w-lg w-full p-6 space-y-4">
+      <div className="bg-black text-w rounded-lg shadow max-w-lg w-full p-6 space-y-4">
         <h1 className="text-xl font-semibold text-green-600">
           ✅ Product Verified
         </h1>
@@ -77,7 +95,7 @@ export default async function VerifyPage(
         </div>
 
         <div className="pt-4 border-t text-sm text-gray-500 break-all">
-          Verification method: Platform verification  
+          Verification method: Platform verification
           <br />
           Identity: {identity}
         </div>

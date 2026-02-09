@@ -24,7 +24,7 @@ export default function AddProductPage() {
 
 
         try {
-            const res = await fetch('/api/products/add', {
+            const res = await fetch('/api/products/all', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
