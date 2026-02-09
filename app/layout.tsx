@@ -7,7 +7,7 @@ import NavBar from "@/components/NavBar";
 
 export const metadata: Metadata = {
   title: "PhyGital",
-  description: "A Phygital Marketplace for Digital Assets",
+  description: "Verify physical products instantly with PhyGital. Scan QR codes to check authenticity, brand details, and product status in seconds.",
 };
 
 export default function RootLayout({
