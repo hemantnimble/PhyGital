@@ -1,6 +1,7 @@
 'use client';
 
 import LiquidEther from '@/components/reactBits/hero-sec';
+import Link from 'next/link';
 
 function HeroSec() {
     return (
@@ -45,10 +46,11 @@ function HeroSec() {
                         Each item is cryptographically verified, recorded on the blockchain,
                         and accessible through a single scan — eliminating counterfeits at the source.
                     </p>
-
-                    <button className="mt-6 rounded-full bg-black/60 px-8 py-3 text-sm font-medium uppercase tracking-wide text-white backdrop-blur transition hover:bg-black/80">
-                        Verify Authenticity
-                    </button>
+                    <Link href='/scanQr'>
+                        <button className="mt-6 cursor-pointer rounded-full bg-black/60 px-8 py-3 text-sm font-medium uppercase tracking-wide text-white backdrop-blur transition hover:bg-black/80">
+                            Verify Authenticity
+                        </button>
+                    </Link>
 
                 </div>
             </div>
