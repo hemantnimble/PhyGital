@@ -4,12 +4,17 @@ import { useEffect, useState } from "react"
 import EditProductModal from "./EditProductModal"
 import ProductQRModal from "./ProductQRModal"
 
+type NFTCertificate = {
+  tokenId: string
+}
+
 type Product = {
   id: string
   name: string
   description?: string
   images: string[]
   status: string
+  nftCertificate?: NFTCertificate | null
 }
 
 export default function BrandProductsClient() {
@@ -17,7 +22,7 @@ export default function BrandProductsClient() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<Product | null>(null)
   const [qrIdentity, setQrIdentity] = useState<string | null>(null)
-
+  const [mintingId, setMintingId] = useState<string | null>(null)
 
   async function fetchProducts() {
     setLoading(true)
@@ -55,6 +60,7 @@ export default function BrandProductsClient() {
 
     const data = await res.json()
 
+    // backend should return identity on activation
     if (data.identity) {
       setQrIdentity(data.identity)
     }
@@ -62,6 +68,33 @@ export default function BrandProductsClient() {
     fetchProducts()
   }
 
+  async function mintProduct(productId: string) {
+    if (!confirm("Mint NFT certificate for this product?")) return
+
+    setMintingId(productId)
+
+    const res = await fetch("/api/mint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        productId,
+        // ⚠️ ideally come from DB (brand.walletAddress)
+        brandWalletAddress: prompt("Enter brand wallet address")!,
+      }),
+    })
+
+    const data = await res.json()
+    setMintingId(null)
+
+    if (!res.ok) {
+      alert(data.error || "Mint failed")
+      return
+    }
+
+    alert(`✅ Minted successfully!\nToken ID: ${data.tokenId}`)
+    fetchProducts()
+  }
 
   if (loading) {
     return <p className="p-6">Loading...</p>
@@ -83,15 +116,25 @@ export default function BrandProductsClient() {
           >
             <div>
               <h2 className="font-medium">{product.name}</h2>
-              <p className="text-sm text-gray-600">
-                {product.description}
-              </p>
+
+              {product.description && (
+                <p className="text-sm text-gray-600">
+                  {product.description}
+                </p>
+              )}
+
               <p className="text-xs mt-1">
                 Status: {product.status}
               </p>
+
+              {product.nftCertificate && (
+                <p className="text-xs text-green-600 mt-1">
+                  ✅ Minted (Token #{product.nftCertificate.tokenId})
+                </p>
+              )}
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => setEditing(product)}
                 className="text-sm px-3 py-1 border rounded"
@@ -115,6 +158,15 @@ export default function BrandProductsClient() {
                 </button>
               )}
 
+              {product.status === "ACTIVE" && !product.nftCertificate && (
+                <button
+                  onClick={() => mintProduct(product.id)}
+                  disabled={mintingId === product.id}
+                  className="text-sm px-3 py-1 border rounded text-purple-600 disabled:opacity-50"
+                >
+                  {mintingId === product.id ? "Minting..." : "Mint NFT"}
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -134,8 +186,6 @@ export default function BrandProductsClient() {
           onClose={() => setQrIdentity(null)}
         />
       )}
-
-
     </div>
   )
 }
