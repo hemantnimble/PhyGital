@@ -9,6 +9,13 @@ import {
 import { auth } from "@/auth";
 import { db } from "@/db";
 
+type CertificateMintedEvent = {
+  tokenId: bigint
+  productHash: string
+  brand: string
+}
+
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session) {
@@ -114,8 +121,8 @@ export async function POST(req: NextRequest) {
         { type: "address", name: "brand", indexed: true },
       ],
       mintLog.data as string,
-      (mintLog.topics as string[]).slice(1) // skip topics[0] which is the event signature
-    );
+      (mintLog.topics as string[]).slice(1)
+    ) as unknown as CertificateMintedEvent;
 
     const tokenId = decoded.tokenId.toString();
 
