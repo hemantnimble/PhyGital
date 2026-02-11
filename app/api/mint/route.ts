@@ -48,7 +48,26 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
+    // ! kjk
+    // 🔐 SECURITY CHECK: brand wallet must exist in DB
+    if (!product.brand?.walletAddress) {
+      return NextResponse.json(
+        { error: "Brand wallet address not set" },
+        { status: 400 }
+      );
+    }
 
+    // 🔐 SECURITY CHECK: wallet must match brand's wallet
+    if (
+      product.brand.walletAddress.toLowerCase() !==
+      brandWalletAddress.toLowerCase()
+    ) {
+      return NextResponse.json(
+        { error: "Invalid brand wallet address" },
+        { status: 403 }
+      );
+    }
+    // ! kjk
     // 2. Hash the product ID
     const productHash = hashProductId(productId);
 

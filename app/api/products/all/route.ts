@@ -73,6 +73,22 @@ export async function POST(req: Request) {
 }
 
 /* ---------------- READ PRODUCTS ---------------- */
+// export async function GET() {
+//   const brand = await getBrandFromSession()
+//   if (!brand) {
+//     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+//   }
+
+//   const products = await db.product.findMany({
+//     where: { brandId: brand.id },
+//     orderBy: { createdAt: "desc" },
+//   })
+
+//   return NextResponse.json(products)
+// }
+
+/*!! -------------!--- READ PRODUCTS ---------------- */
+// !dgndg 
 export async function GET() {
   const brand = await getBrandFromSession()
   if (!brand) {
@@ -82,10 +98,20 @@ export async function GET() {
   const products = await db.product.findMany({
     where: { brandId: brand.id },
     orderBy: { createdAt: "desc" },
+    include: {
+      brand: {
+        select: {
+          walletAddress: true, // ✅ REQUIRED for minting
+        },
+      },
+      nftCertificate: true, // ✅ so UI knows minted state
+    },
   })
 
   return NextResponse.json(products)
 }
+
+
 
 /* ---------------- UPDATE PRODUCT ---------------- */
 export async function PATCH(req: Request) {
