@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       (log) =>
         log.topics &&
         log.topics[0]?.toString().toLowerCase() ===
-          EVENT_SIGNATURE.toLowerCase()
+        EVENT_SIGNATURE.toLowerCase()
     );
 
     if (!mintLog) {
@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
       (mintLog.topics as string[]).slice(1) // skip topics[0] which is the event signature
     );
 
-    const tokenId = decoded.tokenId.toString();
+    const tokenId = (decoded as any).tokenId as string;
 
     // 9. Save NFTCertificate to MongoDB
     const certificate = await db.nFTCertificate.create({
