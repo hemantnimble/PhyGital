@@ -75,8 +75,8 @@ export default async function VerifyPage(
 
   // ✅ VERIFIED — SHOW EVERYTHING
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-lg shadow max-w-xl w-full p-6 space-y-5">
+    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      <div className="bg-gray-900 text-white rounded-lg shadow max-w-xl w-full p-6 space-y-5">
 
         <h1 className="text-2xl font-semibold text-green-600">
           ✅ Authentic Product Verified
