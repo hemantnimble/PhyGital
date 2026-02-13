@@ -2,7 +2,7 @@
 
 # dependencies
 /node_modules
-/blockchain
+# /blockchain
 /.pnp
 .pnp.*
 .yarn/*
