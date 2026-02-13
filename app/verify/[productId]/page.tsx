@@ -26,6 +26,7 @@ type Product = {
   name: string
   description: string | null
   productCode: string
+  images: string[]
   brand: Brand
   nftCertificate: NFTCertificate | null
   ownershipHistory: OwnershipRecord[]
@@ -147,7 +148,7 @@ export default function VerifyPage() {
   return (
     <div className="min-h-screen bg-black p-6">
       <div className="max-w-2xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg p-6 space-y-6">
-        
+
         {/* ═══════════════════════════════════════════ */}
         {/* AUTHENTICITY BADGE */}
         {/* ═══════════════════════════════════════════ */}
@@ -172,6 +173,16 @@ export default function VerifyPage() {
         {/* ═══════════════════════════════════════════ */}
         <div className="border-t border-gray-700 pt-6">
           <h2 className="text-sm font-semibold text-gray-400 mb-3">Product</h2>
+          {/* Small Product Image */}
+          {product.images && product.images.length > 0 && (
+            <div className="mb-4">
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="w-28 h-28 object-cover rounded-md border border-gray-700"
+              />
+            </div>
+          )}
           <p className="text-xl font-bold text-white">{product.name}</p>
           {product.description && (
             <p className="text-gray-300 mt-2">{product.description}</p>
