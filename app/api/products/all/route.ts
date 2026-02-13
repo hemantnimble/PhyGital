@@ -2,8 +2,6 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/db"
 import { ProductStatus } from "@prisma/client"
-import { randomUUID } from "crypto"
-
 
 export const dynamic = "force-dynamic"
 
@@ -72,23 +70,6 @@ export async function POST(req: Request) {
   }
 }
 
-/* ---------------- READ PRODUCTS ---------------- */
-// export async function GET() {
-//   const brand = await getBrandFromSession()
-//   if (!brand) {
-//     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-//   }
-
-//   const products = await db.product.findMany({
-//     where: { brandId: brand.id },
-//     orderBy: { createdAt: "desc" },
-//   })
-
-//   return NextResponse.json(products)
-// }
-
-/*!! -------------!--- READ PRODUCTS ---------------- */
-// !dgndg 
 export async function GET() {
   const brand = await getBrandFromSession()
   if (!brand) {
@@ -101,17 +82,15 @@ export async function GET() {
     include: {
       brand: {
         select: {
-          walletAddress: true, // ✅ REQUIRED for minting
+          walletAddress: true,
         },
       },
-      nftCertificate: true, // ✅ so UI knows minted state
+      nftCertificate: true,
     },
   })
 
   return NextResponse.json(products)
 }
-
-
 
 /* ---------------- UPDATE PRODUCT ---------------- */
 export async function PATCH(req: Request) {
@@ -123,7 +102,7 @@ export async function PATCH(req: Request) {
   const body = await req.json()
   const { id, name, description, images, status } = body
 
-  // 🟢 ACTIVATE PRODUCT (NEW PART)
+  // ✅ ACTIVATE PRODUCT
   if (status === "ACTIVE") {
     const product = await db.product.findFirst({
       where: {
@@ -148,8 +127,7 @@ export async function PATCH(req: Request) {
       )
     }
 
-    const identityValue = randomUUID()
-
+    // ✅ CHANGED: Use productId as the identity value
     await db.$transaction([
       db.product.update({
         where: { id: product.id },
@@ -159,15 +137,16 @@ export async function PATCH(req: Request) {
       db.productIdentity.create({
         data: {
           type: "QR",
-          value: identityValue,
+          value: product.id, // ✅ Use productId instead of randomUUID
           productId: product.id,
         },
       }),
     ])
 
+    // ✅ CHANGED: Return productId instead of identity
     return NextResponse.json({
       success: true,
-      identity: identityValue,
+      productId: product.id, // ✅ Frontend will use this for QR
     })
   }
 
@@ -191,7 +170,7 @@ export async function PATCH(req: Request) {
   return NextResponse.json({ success: true })
 }
 
-
+/* ---------------- DELETE PRODUCT ---------------- */
 /* ---------------- DELETE PRODUCT ---------------- */
 export async function DELETE(req: Request) {
   const brand = await getBrandFromSession()
@@ -208,11 +187,16 @@ export async function DELETE(req: Request) {
     )
   }
 
-  // 1️⃣ Fetch product first (important)
+  // 1️⃣ Fetch product with all relations
   const product = await db.product.findFirst({
     where: {
       id,
       brandId: brand.id,
+    },
+    include: {
+      identity: true,
+      nftCertificate: true,
+      ownershipHistory: true,
     },
   })
 
@@ -220,8 +204,8 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ message: "Product not found" }, { status: 404 })
   }
 
-  // 2️⃣ ACTIVE → SOFT DELETE
-  if (product.status === "ACTIVE") {
+  // 2️⃣ If ACTIVE or has NFT → SOFT DELETE only
+  if (product.status === "ACTIVE" || product.nftCertificate) {
     await db.product.update({
       where: { id: product.id },
       data: { status: "FLAGGED" },
@@ -230,14 +214,52 @@ export async function DELETE(req: Request) {
     return NextResponse.json({
       success: true,
       softDeleted: true,
+      message: "Product marked as FLAGGED (soft delete). Cannot hard delete active/minted products.",
     })
   }
 
-  // 3️⃣ DRAFT → HARD DELETE
-  await db.product.delete({
-    where: { id: product.id },
-  })
+  // 3️⃣ DRAFT → HARD DELETE (with cascade)
+  try {
+    await db.$transaction(async (tx) => {
+      // Delete in correct order (children first, then parent)
 
-  return NextResponse.json({ success: true })
+      // Delete ProductIdentity if exists
+      if (product.identity) {
+        await tx.productIdentity.delete({
+          where: { id: product.identity.id },
+        })
+      }
+
+      // Delete VerificationLogs if any
+      await tx.verificationLog.deleteMany({
+        where: { productId: product.id },
+      })
+
+      // Delete OwnershipHistory if any
+      await tx.ownershipHistory.deleteMany({
+        where: { productId: product.id },
+      })
+
+      // Delete NFTCertificate if exists (shouldn't for DRAFT, but just in case)
+      await tx.nFTCertificate.deleteMany({
+        where: { productId: product.id },
+      })
+
+      // Finally delete the Product
+      await tx.product.delete({
+        where: { id: product.id },
+      })
+    })
+
+    return NextResponse.json({
+      success: true,
+      hardDeleted: true,
+    })
+  } catch (error: any) {
+    console.error("Delete error:", error)
+    return NextResponse.json(
+      { message: "Failed to delete product" },
+      { status: 500 }
+    )
+  }
 }
-

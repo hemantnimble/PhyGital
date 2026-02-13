@@ -4,19 +4,19 @@ import QRCode from "qrcode"
 import { useEffect, useState } from "react"
 
 export default function ProductQRModal({
-  identity,
+  productId,
   onClose,
 }: {
-  identity: string
+  productId: string
   onClose: () => void
 }) {
   const [qr, setQr] = useState<string>("")
 
   useEffect(() => {
     QRCode.toDataURL(
-      `${process.env.NEXT_PUBLIC_APP_URL}/verify/${identity}`
+      `${process.env.NEXT_PUBLIC_APP_URL}/verify/${productId}`
     ).then(setQr)
-  }, [identity])
+  }, [productId])
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
@@ -28,7 +28,7 @@ export default function ProductQRModal({
         {qr && <img src={qr} alt="QR Code" />}
 
         <p className="text-sm mt-2 break-all">
-          {identity}
+          {productId}
         </p>
 
         <button
