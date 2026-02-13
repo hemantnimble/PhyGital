@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
       data: txData,
       gas: "300000",
       gasPrice: gasPrice.toString(),
-      nonce: nonce,
+      nonce: Number(nonce), // ✅ Convert to number
       chainId: 11155111,
     };
 
