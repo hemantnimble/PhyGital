@@ -5,9 +5,9 @@ function NavBar() {
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
-        { label: 'Dashboard', ariaLabel: 'Learn about us', link: '/dashboard' },
-        { label: 'Admin Dash', ariaLabel: 'View our services', link: '/dashboard/admin' },
-        { label: 'Contact', ariaLabel: 'Get in touch', link: '/contact' }
+        { label: 'Verify Product', ariaLabel: 'Learn about us', link: '/dashboard' },
+        { label: 'For Brands', ariaLabel: 'View our services', link: '/dashboard' },
+        { label: 'How It Works', ariaLabel: 'Get in touch', link: '/contact' }
     ];
 
     const socialItems = [
@@ -27,10 +27,10 @@ function NavBar() {
                 socialItems={socialItems}
                 displaySocials
                 displayItemNumbering={true}
-                menuButtonColor="#ffffff"
+                menuButtonColor="#000000"
                 openMenuButtonColor="#000000"
                 changeMenuColorOnOpen={true}
-                colors={['#000000', '#000000']}
+                colors={['#000870', '#67008e']}
                 logoUrl="/assets/logo.png"
                 accentColor="#5227FF"
                 onMenuOpen={() => console.log('Menu opened')}

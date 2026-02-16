@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
+import Alert from "@/components/Alert"
+import { parseBlockchainError } from "@/utils/errors"
+import { checkNetwork, switchToSepolia } from "@/utils/network"
+
 
 type Brand = {
   name: string
@@ -67,9 +71,36 @@ export default function VerifyPage() {
     fetchProduct()
   }, [productId])
 
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "warning" | "info"
+    title: string
+    message: string
+    action?: string
+  } | null>(null)
+
+
   async function handleClaim() {
+
+     const network = await checkNetwork()
+  if (!network.correct) {
+    setAlert({
+      type: "error",
+      title: "Wrong Network",
+      message: `You're on ${network.current}. Please switch to ${network.expected}.`,
+      action: "Click here to switch automatically",
+    })
+    
+    // Try to switch automatically
+    const switched = await switchToSepolia()
+    if (!switched) return
+  }
     if (!claimWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
-      alert("Invalid Ethereum address")
+      setAlert({
+        type: "error",
+        title: "Invalid Address",
+        message: "Please enter a valid Ethereum wallet address.",
+        action: "Format: 0x followed by 40 characters (0-9, a-f)",
+      })
       return
     }
 
@@ -79,30 +110,68 @@ export default function VerifyPage() {
 
     setClaiming(true)
 
-    const res = await fetch("/api/claim", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId,
-        newOwnerWallet: claimWallet,
-      }),
-    })
+    try {
+      const res = await fetch("/api/claim", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId,
+          newOwnerWallet: claimWallet,
+        }),
+      })
 
-    const data = await res.json()
-    setClaiming(false)
+      const data = await res.json()
 
-    if (!res.ok) {
-      alert(`❌ ${data.error}`)
-      return
+      if (!res.ok) {
+        // Parse error and show user-friendly message
+        const errorInfo = parseBlockchainError(data.error)
+        setAlert({
+          type: "error",
+          ...errorInfo,
+        })
+        setClaiming(false)
+        return
+      }
+
+      // Success!
+      setAlert({
+        type: "success",
+        title: "Ownership Claimed! 🎉",
+        message: `The NFT has been transferred to your wallet.`,
+        action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}`,
+      })
+
+      // Wait a bit before reload so user can see success message
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000)
+
+    } catch (error: any) {
+      const errorInfo = parseBlockchainError(error)
+      setAlert({
+        type: "error",
+        ...errorInfo,
+      })
+      setClaiming(false)
     }
-
-    alert(`✅ Ownership Claimed!\n\nTX: ${data.txHash}\n\nView on Etherscan:\nhttps://sepolia.etherscan.io/tx/${data.txHash}`)
-    window.location.reload()
   }
 
   async function handleTransfer() {
     if (!transferFromWallet.match(/^0x[a-fA-F0-9]{40}$/) || !transferToWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
-      alert("Invalid Ethereum address")
+      setAlert({
+        type: "error",
+        title: "Invalid Address",
+        message: "Please enter valid Ethereum wallet addresses for both fields.",
+      })
+      return
+    }
+
+    if (transferFromWallet.toLowerCase() === transferToWallet.toLowerCase()) {
+      setAlert({
+        type: "warning",
+        title: "Same Address",
+        message: "You're trying to transfer to the same wallet. Please enter a different address.",
+      })
       return
     }
 
@@ -112,27 +181,50 @@ export default function VerifyPage() {
 
     setTransferring(true)
 
-    const res = await fetch("/api/transfer", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        productId,
-        fromWallet: transferFromWallet,
-        toWallet: transferToWallet,
-      }),
-    })
+    try {
+      const res = await fetch("/api/transfer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId,
+          fromWallet: transferFromWallet,
+          toWallet: transferToWallet,
+        }),
+      })
 
-    const data = await res.json()
-    setTransferring(false)
+      const data = await res.json()
 
-    if (!res.ok) {
-      alert(`❌ ${data.error}`)
-      return
+      if (!res.ok) {
+        const errorInfo = parseBlockchainError(data.error)
+        setAlert({
+          type: "error",
+          ...errorInfo,
+        })
+        setTransferring(false)
+        return
+      }
+
+      setAlert({
+        type: "success",
+        title: "Ownership Transferred! 🎉",
+        message: `The NFT has been transferred to the new owner.`,
+        action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}`,
+      })
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 3000)
+
+    } catch (error: any) {
+      const errorInfo = parseBlockchainError(error)
+      setAlert({
+        type: "error",
+        ...errorInfo,
+      })
+      setTransferring(false)
     }
-
-    alert(`✅ Ownership Transferred!\n\nTX: ${data.txHash}\n\nView on Etherscan:\nhttps://sepolia.etherscan.io/tx/${data.txHash}`)
-    window.location.reload()
   }
+
 
   if (loading) {
     return <div className="p-6 bg-black min-h-screen text-white">Loading...</div>
@@ -147,6 +239,17 @@ export default function VerifyPage() {
 
   return (
     <div className="min-h-screen bg-black p-6">
+      {/* ✅ Show alert if exists */}
+      {alert && (
+        <Alert
+          type={alert.type}
+          title={alert.title}
+          message={alert.message}
+          action={alert.action}
+          onClose={() => setAlert(null)}
+          autoClose={alert.type === "success" ? 5000 : 0}
+        />
+      )}
       <div className="max-w-2xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg p-6 space-y-6">
 
         {/* ═══════════════════════════════════════════ */}

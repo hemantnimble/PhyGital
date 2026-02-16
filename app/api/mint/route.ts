@@ -22,14 +22,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { productId, brandWalletAddress } = await req.json();
+  const { productId } = await req.json();
 
-  if (!productId || !brandWalletAddress) {
+  if (!productId) {
     return NextResponse.json(
-      { error: "Missing productId or brandWalletAddress" },
+      { error: "Missing productId " },
       { status: 400 }
     );
   }
+
+
+  // ✅ CHECK 3: Fetch product with brand info
+  const product = await db.product.findUnique({
+    where: { id: productId },
+    include: {
+      brand: true,
+      nftCertificate: true,
+    },
+  })
+
+  if (!product) {
+    return NextResponse.json(
+      { error: "Product not found" },
+      { status: 404 }
+    )
+  }
+
+  // ✅ CHECK 6: Verify brand wallet exists
+  const brandWalletAddress = product.brand.walletAddress
+
+  if (!brandWalletAddress) {
+    return NextResponse.json(
+      { error: "Brand wallet address not set. Please set it in Settings first." },
+      { status: 400 }
+    )
+  }
+
 
   try {
     // 1. Check product exists + not already minted

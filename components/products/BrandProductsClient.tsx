@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react"
 import EditProductModal from "./EditProductModal"
 import ProductQRModal from "./ProductQRModal"
+import Alert from "@/components/Alert"
+import { parseBlockchainError, parseAPIError } from "@/utils/errors"
 
 type NFTCertificate = {
   tokenId: string
@@ -50,33 +52,12 @@ export default function BrandProductsClient() {
     fetchProducts()
   }, [])
 
-  async function deleteProduct(id: string) {
-    const product = products.find(p => p.id === id)
-
-    let confirmMessage = "Delete this product?"
-
-    if (product?.status === "ACTIVE" || product?.nftCertificate) {
-      confirmMessage = "This product cannot be hard deleted. It will be marked as FLAGGED. Continue?"
-    }
-
-    if (!confirm(confirmMessage)) return
-
-    const res = await fetch("/api/products/all", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    })
-
-    const data = await res.json()
-
-    if (data.softDeleted) {
-      alert("⚠️ Product marked as FLAGGED (soft delete)")
-    } else if (data.hardDeleted) {
-      alert("✅ Product permanently deleted")
-    }
-
-    fetchProducts()
-  }
+  const [alert, setAlert] = useState<{
+    type: "success" | "error" | "warning" | "info"
+    title: string
+    message: string
+    action?: string
+  } | null>(null)
 
   async function activateProduct(id: string) {
     const res = await fetch("/api/products/all", {
@@ -98,37 +79,114 @@ export default function BrandProductsClient() {
     fetchProducts()
   }
 
-  async function mintProduct(product: Product) {
-    if (!product.brand?.walletAddress) {
-      alert("⚠️ Please add a wallet address to your brand profile first")
+
+  async function mintProduct(product: any) {
+  // Check wallet address
+  if (!product.brand?.walletAddress) {
+    setAlert({
+      type: "error",
+      title: "Wallet Not Set",
+      message: "Please set your wallet address in Settings before minting.",
+      action: "Go to Settings → Enter your MetaMask wallet address",
+    })
+    return
+  }
+
+  if (!confirm(`Mint NFT for "${product.name}"?\n\nThis will create a blockchain certificate.`)) {
+    return
+  }
+
+  setMintingId(product.id)
+
+  try {
+    console.log("🎟️ Minting NFT for product:", product.id)
+    
+    const res = await fetch("/api/mint", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        productId: product.id  // ✅ Make sure this is being sent
+      }),
+    })
+
+    console.log("Response status:", res.status)
+    const data = await res.json()
+    console.log("Response data:", data)
+
+    if (!res.ok) {
+      const errorInfo = parseBlockchainError(data.error)
+      setAlert({
+        type: "error",
+        ...errorInfo,
+      })
+      setMintingId(null)
       return
     }
 
-    if (!confirm("Mint NFT certificate for this product? This will cost gas fees."))
-      return
+    setAlert({
+      type: "success",
+      title: "NFT Minted! 🎉",
+      message: `Token #${data.tokenId} created successfully.`,
+      action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}`,
+    })
 
-    setMintingId(product.id)
+    fetchProducts()
+    setMintingId(null)
+
+  } catch (error: any) {
+    console.error("Mint error:", error)
+    const errorInfo = parseBlockchainError(error)
+    setAlert({
+      type: "error",
+      ...errorInfo,
+    })
+    setMintingId(null)
+  }
+}
+
+  async function deleteProduct(id: string) {
+    // ... existing code ...
 
     try {
-      const res = await fetch("/api/mint", {
-        method: "POST",
+      const res = await fetch("/api/products/all", {
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          productId: product.id,
-          brandWalletAddress: product.brand.walletAddress,
-        }),
+        body: JSON.stringify({ id }),
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Mint failed")
 
-      setMintResult(data)
+      if (!res.ok) {
+        const errorInfo = parseAPIError(data)
+        setAlert({
+          type: "error",
+          ...errorInfo,
+        })
+        return
+      }
+
+      if (data.softDeleted) {
+        setAlert({
+          type: "warning",
+          title: "Product Flagged",
+          message: "Active/minted products cannot be deleted. Status changed to FLAGGED.",
+        })
+      } else {
+        setAlert({
+          type: "success",
+          title: "Product Deleted",
+          message: "The product has been permanently removed.",
+        })
+      }
+
       fetchProducts()
+
     } catch (error: any) {
-      alert(`❌ Mint failed: ${error.message}`)
-    } finally {
-      setMintingId(null)
+      setAlert({
+        type: "error",
+        title: "Delete Failed",
+        message: "Could not delete product. Please try again.",
+      })
     }
   }
 
@@ -138,6 +196,16 @@ export default function BrandProductsClient() {
 
   return (
     <div className="p-6 space-y-4">
+      {alert && (
+        <Alert
+          type={alert.type}
+          title={alert.title}
+          message={alert.message}
+          action={alert.action}
+          onClose={() => setAlert(null)}
+          autoClose={alert.type === "success" ? 5000 : 0}
+        />
+      )}
       <h1 className="text-2xl font-semibold">Your Products</h1>
 
       <div className="grid gap-4">
