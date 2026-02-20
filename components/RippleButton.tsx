@@ -81,7 +81,7 @@ export default function RippleButton({ children, ...props }: RippleButtonProps) 
     return (
         <button
             ref={buttonRef}
-            className="font-jost duration-[600ms] relative flex items-center justify-center overflow-hidden rounded-full bg-[#ffffff] py-1 px-3.75 cursor-pointer font-medium text-[#0e352e] transition hover:text-white"
+            className="font-jost duration-[600ms] relative flex items-center justify-center overflow-hidden rounded-full bg-[#a27c49] py-1 px-3.75 cursor-pointer font-medium text-[#000000] transition hover:text-white"
             onMouseEnter={(e) => {
                 if (e.target === e.currentTarget) {
                     createRipple(e);
@@ -102,7 +102,7 @@ export default function RippleButton({ children, ...props }: RippleButtonProps) 
           position: absolute;
           border-radius: 50%;
           pointer-events: none;
-          background-color: #000000;
+          background-color: #73706c;
           z-index: 1;
           opacity: 0;
           transition: transform 50ms linear;
