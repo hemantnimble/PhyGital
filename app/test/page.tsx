@@ -1,253 +1,668 @@
-"use client";
-import { useState } from "react";
-import Link from "next/link";
-// import PageShell from "../shared/PageShell";
+"use client"
 
-const ALL_PRODUCTS = [
-  { id:"p1", name:"Air Jordan 1 Retro High OG", sku:"AJ1-001",  status:"ACTIVE",  tokenId:"#2847", scans:1247, minted:"Feb 19, 2026" },
-  { id:"p2", name:"Air Jordan 4 Retro",          sku:"AJ4-002",  status:"ACTIVE",  tokenId:"#2848", scans:892,  minted:"Feb 19, 2026" },
-  { id:"p3", name:"Air Max 90 OG",               sku:"AM90-001", status:"DRAFT",   tokenId:"—",     scans:0,    minted:"—" },
-  { id:"p4", name:"Jordan Shorts Classic",        sku:"JSC-004",  status:"PENDING", tokenId:"—",     scans:0,    minted:"—" },
-  { id:"p5", name:"Nike Dunk Low Retro",          sku:"NDL-005",  status:"ACTIVE",  tokenId:"#2849", scans:543,  minted:"Feb 20, 2026" },
-  { id:"p6", name:"Air Force 1 '07",             sku:"AF1-006",  status:"ACTIVE",  tokenId:"#2850", scans:311,  minted:"Feb 20, 2026" },
-];
+import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
+import { Html5Qrcode } from "html5-qrcode"
 
-type Status = "ALL" | "ACTIVE" | "DRAFT" | "PENDING";
+export default function ScanPage() {
+  const router = useRouter()
+  const [scanning, setScanning] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [step, setStep] = useState(1)
+  const scannerRef = useRef<Html5Qrcode | null>(null)
+  const [cameraPermission, setCameraPermission] = useState<"granted" | "denied" | "prompt">("prompt")
+  const handledRef = useRef(false)
 
-export default function BrandProductsPage() {
-  const [filter, setFilter] = useState<Status>("ALL");
-  const [search, setSearch] = useState("");
-  const [selected, setSelected] = useState<string[]>([]);
+  useEffect(() => {
+    return () => {
+      if (scannerRef.current) {
+        scannerRef.current
+          .stop()
+          .catch(() => {})
+          .finally(() => { scannerRef.current = null })
+      }
+    }
+  }, [])
 
-  const filtered = ALL_PRODUCTS.filter(p => {
-    const matchStatus = filter === "ALL" || p.status === filter;
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase());
-    return matchStatus && matchSearch;
-  });
+  async function startScanning() {
+    setError(null)
+    setStep(2)
 
-  const toggleSelect = (id: string) =>
-    setSelected(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
+    try {
+      const scanner = new Html5Qrcode("qr-reader")
+      scannerRef.current = scanner
+
+      await scanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          if (handledRef.current) return
+          handledRef.current = true
+
+          const match = decodedText.match(/\/verify\/([a-f0-9]{24})/)
+
+          if (match) {
+            const productId = match[1]
+            if (scannerRef.current) {
+              scannerRef.current.stop()
+                .then(() => {
+                  scannerRef.current?.clear()
+                  scannerRef.current = null
+                  router.push(`/verify/${productId}`)
+                })
+                .catch(() => { router.push(`/verify/${productId}`) })
+            } else {
+              router.push(`/verify/${productId}`)
+            }
+          } else if (decodedText.includes("/verify/")) {
+            if (scannerRef.current) {
+              scannerRef.current.stop()
+                .catch(() => {})
+                .finally(() => {
+                  scannerRef.current = null
+                  window.location.href = decodedText
+                })
+            } else {
+              window.location.href = decodedText
+            }
+          } else {
+            setError("Invalid QR code. Please scan a Phygital product QR code.")
+            handledRef.current = false
+            stopScanning()
+          }
+        },
+        () => {}
+      )
+
+      setScanning(true)
+      setCameraPermission("granted")
+      setStep(3)
+
+    } catch (err: any) {
+      if (err.name === "NotAllowedError" || err.message?.includes("Permission")) {
+        setError("Camera permission denied. Please allow camera access in your browser settings.")
+        setCameraPermission("denied")
+      } else if (err.name === "NotFoundError") {
+        setError("No camera found on this device.")
+      } else {
+        setError("Failed to start camera. Please try again.")
+      }
+      setStep(1)
+    }
+  }
+
+  function stopScanning() {
+    if (scannerRef.current) {
+      scannerRef.current.stop()
+        .then(() => {
+          scannerRef.current?.clear()
+          scannerRef.current = null
+          setScanning(false)
+          setStep(1)
+        })
+        .catch(() => {
+          scannerRef.current = null
+          setScanning(false)
+          setStep(1)
+        })
+    }
+  }
+
+  const steps = [
+    {
+      n: "01",
+      t: "Allow Camera",
+      d: "Click Start Scanning and allow camera access when prompted by your browser.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      ),
+    },
+    {
+      n: "02",
+      t: "Point at QR Code",
+      d: "Hold the camera steady over the product's QR code until it is detected.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+          <path d="M14 14h3v3h-3zM17 17h4v4h-4z"/>
+        </svg>
+      ),
+    },
+    {
+      n: "03",
+      t: "View Certificate",
+      d: "Instantly see the blockchain-backed authenticity certificate and ownership history.",
+      icon: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4"/>
+        </svg>
+      ),
+    },
+  ]
 
   return (
     <>
       <style>{`
-        .products-header {
-          padding: 48px 5vw 32px;
-          border-bottom: 1px solid rgba(184,154,106,0.15);
-          display: flex; justify-content: space-between;
-          align-items: flex-end; flex-wrap: wrap; gap: 20px;
+        .scan-page {
+          background: var(--cream);
+          min-height: 100vh;
+          padding-top: 100px;
+          padding-bottom: 80px;
         }
 
-        .filter-bar {
-          padding: 20px 5vw;
-          border-bottom: 1px solid rgba(184,154,106,0.12);
-          display: flex; justify-content: space-between;
-          align-items: center; gap: 16px; flex-wrap: wrap;
+        /* ── PAGE HEADER ── */
+        .scan-header {
+          text-align: center;
+          padding: 0 5vw 60px;
         }
 
-        .filter-tabs { display: flex; gap: 4px; }
-
-        .filter-tab {
-          padding: 7px 18px; border-radius: 100px;
-          font-size: 11px; letter-spacing: 0.08em;
-          text-transform: uppercase; cursor: pointer;
-          border: 1px solid transparent;
-          font-family: 'DM Sans', sans-serif; font-weight: 400;
-          color: var(--stone); background: transparent;
+        .scan-eyebrow {
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--gold);
+          margin-bottom: 16px;
+          font-weight: 400;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
         }
 
-        .filter-tab.active {
-          background: var(--ink); color: var(--cream);
-          border-color: var(--ink);
+        .scan-eyebrow::before,
+        .scan-eyebrow::after {
+          content: '';
+          display: block;
+          width: 30px;
+          height: 1px;
+          background: var(--gold);
         }
 
-        .search-wrap { position: relative; }
-        .search-icon {
-          position: absolute; left: 14px; top: 50%;
-          transform: translateY(-50%);
-          width: 14px; height: 14px;
-          stroke: var(--stone); fill: none;
-          stroke-width: 1.5; stroke-linecap: round;
+        .scan-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(44px, 7vw, 96px);
+          font-weight: 900;
+          letter-spacing: -0.03em;
+          line-height: 0.92;
+          color: var(--ink);
+          margin-bottom: 20px;
         }
-        .search-input {
-          padding: 9px 16px 9px 38px;
-          border: 1px solid rgba(184,154,106,0.25);
-          border-radius: 100px; font-size: 13px;
-          font-family: 'DM Sans', sans-serif;
-          color: var(--ink); background: white; outline: none;
-          width: 240px;
+
+        .scan-title em {
+          font-style: italic;
+          color: transparent;
+          -webkit-text-stroke: 1.5px rgba(14,13,11,0.22);
         }
-        .search-input:focus { border-color: var(--gold); }
-        .search-input::placeholder { color: rgba(140,131,120,0.5); }
 
-        .products-body { padding: 32px 5vw 80px; }
+        .scan-subtitle {
+          font-size: clamp(14px, 1.2vw, 16px);
+          color: var(--stone);
+          max-width: 400px;
+          margin: 0 auto;
+          line-height: 1.7;
+          font-weight: 300;
+        }
 
-        /* Bulk action bar */
-        .bulk-bar {
-          display: flex; align-items: center; gap: 14px;
-          padding: 12px 20px;
-          background: rgba(184,154,106,0.06);
+        /* ── SCANNER CARD ── */
+        .scanner-wrap {
+          max-width: 560px;
+          margin: 0 auto 48px;
+          padding: 0 5vw;
+        }
+
+        .scanner-card {
+          background: var(--ink);
           border: 1px solid rgba(184,154,106,0.2);
-          border-radius: 12px; margin-bottom: 20px;
-          font-size: 13px; color: var(--ink);
+          border-radius: 28px;
+          overflow: hidden;
+          position: relative;
         }
 
-        /* Product table */
-        .checkbox {
-          width: 16px; height: 16px;
-          border: 1px solid rgba(184,154,106,0.4);
-          border-radius: 4px; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          flex-shrink: 0; background: white;
+        /* QR reader output styles override */
+        #qr-reader {
+          width: 100% !important;
+          border: none !important;
+          background: transparent !important;
         }
-        .checkbox.checked { background: var(--ink); border-color: var(--ink); }
 
-        .product-name-cell { font-size: 14px; font-weight: 500; color: var(--ink); letter-spacing: -0.01em; margin-bottom: 2px; }
-        .product-sku       { font-size: 11px; color: var(--stone); font-family: monospace; }
-
-        .scan-bar {
-          width: 80px; height: 4px;
-          background: rgba(184,154,106,0.15); border-radius: 100px;
-          overflow: hidden; display: inline-block;
+        #qr-reader video {
+          border-radius: 0 !important;
         }
-        .scan-fill { height: 100%; background: var(--gold); border-radius: 100px; }
 
-        .row-actions { display: flex; gap: 8px; opacity: 0; }
-        tr:hover .row-actions { opacity: 1; }
-
-        .row-action-btn {
-          background: none; border: 1px solid rgba(184,154,106,0.25);
-          border-radius: 8px; padding: 5px 12px;
-          font-size: 10px; letter-spacing: 0.08em;
-          text-transform: uppercase; color: var(--stone);
-          cursor: pointer; font-family: 'DM Sans', sans-serif;
+        #qr-reader__scan_region {
+          background: transparent !important;
         }
-        .row-action-btn:hover { border-color: var(--gold); color: var(--ink); }
 
-        .empty-state {
-          text-align: center; padding: 80px 24px;
-          border: 1px solid rgba(184,154,106,0.15);
-          border-radius: 20px; background: white;
+        #qr-reader__dashboard {
+          display: none !important;
         }
-        .empty-icon { margin-bottom: 16px; color: rgba(184,154,106,0.4); }
-        .empty-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
-        .empty-sub { font-size: 13px; color: var(--stone); margin-bottom: 24px; }
+
+        /* ── SCANNER IDLE STATE ── */
+        .scanner-idle {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 60px 40px;
+          text-align: center;
+        }
+
+        .scanner-idle-icon {
+          width: 100px;
+          height: 100px;
+          border: 1px solid rgba(184,154,106,0.25);
+          border-radius: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 28px;
+          color: var(--gold);
+          position: relative;
+        }
+
+        .scanner-idle-icon::before {
+          content: '';
+          position: absolute;
+          inset: -8px;
+          border: 1px dashed rgba(184,154,106,0.2);
+          border-radius: 32px;
+        }
+
+        .scanner-idle-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 24px;
+          font-weight: 800;
+          color: white;
+          margin-bottom: 10px;
+          letter-spacing: -0.02em;
+        }
+
+        .scanner-idle-sub {
+          font-size: 13px;
+          color: rgba(255,255,255,0.4);
+          line-height: 1.6;
+          margin-bottom: 32px;
+          max-width: 280px;
+        }
+
+        .btn-scan-start {
+          background: var(--gold);
+          color: var(--ink);
+          border: none;
+          border-radius: 100px;
+          padding: 14px 34px;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          letter-spacing: 0.02em;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          font-family: 'DM Sans', sans-serif;
+          transition: opacity 0.2s;
+        }
+
+        .btn-scan-start:hover { opacity: 0.88; }
+
+        /* ── SCANNING ACTIVE STATE ── */
+        .scanning-indicator {
+          position: absolute;
+          top: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(109,190,140,0.15);
+          border: 1px solid rgba(109,190,140,0.4);
+          border-radius: 100px;
+          padding: 6px 18px;
+          font-size: 11px;
+          color: #6DBE8C;
+          font-weight: 500;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          z-index: 20;
+          white-space: nowrap;
+        }
+
+        .scan-pulse {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #6DBE8C;
+          animation: scanPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes scanPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.75); }
+        }
+
+        /* ── SCANNER FOOTER ── */
+        .scanner-footer {
+          border-top: 1px solid rgba(184,154,106,0.12);
+          padding: 16px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .scanner-footer-label {
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+        }
+
+        .btn-scan-stop {
+          background: rgba(255,255,255,0.06);
+          color: rgba(255,255,255,0.7);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 100px;
+          padding: 8px 20px;
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          transition: all 0.2s;
+          letter-spacing: 0.02em;
+        }
+
+        .btn-scan-stop:hover {
+          background: rgba(255,255,255,0.1);
+          color: white;
+        }
+
+        /* ── ERROR STATE ── */
+        .scan-error {
+          margin: 0 16px 16px;
+          background: rgba(220,80,80,0.1);
+          border: 1px solid rgba(220,80,80,0.25);
+          border-radius: 16px;
+          padding: 16px 20px;
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .scan-error-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #dc5050;
+          flex-shrink: 0;
+          margin-top: 5px;
+        }
+
+        .scan-error-title {
+          font-size: 12px;
+          font-weight: 600;
+          color: #e87070;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-bottom: 4px;
+        }
+
+        .scan-error-msg {
+          font-size: 12px;
+          color: rgba(255,255,255,0.5);
+          line-height: 1.5;
+        }
+
+        /* ── MANUAL ENTRY ── */
+        .manual-entry {
+          text-align: center;
+          margin-top: 20px;
+        }
+
+        .manual-entry-label {
+          font-size: 12px;
+          color: var(--stone);
+          margin-bottom: 10px;
+          letter-spacing: 0.05em;
+        }
+
+        .btn-manual {
+          background: transparent;
+          border: none;
+          color: var(--gold);
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          letter-spacing: 0.05em;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-manual:hover { opacity: 0.7; }
+
+        /* ── HOW IT WORKS STEPS ── */
+        .scan-steps-section {
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 0 5vw;
+        }
+
+        .scan-steps-eyebrow {
+          font-size: 10px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--stone);
+          text-align: center;
+          margin-bottom: 36px;
+          font-weight: 400;
+        }
+
+        .scan-steps-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          border: 1px solid rgba(184,154,106,0.18);
+          border-radius: 24px;
+          overflow: hidden;
+        }
+
+        .scan-step {
+          padding: 36px 28px;
+          border-right: 1px solid rgba(184,154,106,0.15);
+          background: white;
+          position: relative;
+        }
+
+        .scan-step:last-child { border-right: none; }
+
+        .scan-step-active {
+          background: var(--ink);
+        }
+
+        .scan-step-num {
+          font-size: 10px;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          color: var(--gold);
+          margin-bottom: 16px;
+          font-weight: 400;
+        }
+
+        .scan-step-icon {
+          margin-bottom: 16px;
+        }
+
+        .scan-step-icon-inner {
+          width: 42px;
+          height: 42px;
+          border: 1px solid rgba(184,154,106,0.3);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--gold);
+        }
+
+        .scan-step-active .scan-step-icon-inner {
+          border-color: rgba(184,154,106,0.25);
+        }
+
+        .scan-step-title {
+          font-family: 'Playfair Display', serif;
+          font-size: 18px;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          margin-bottom: 10px;
+          line-height: 1.1;
+        }
+
+        .scan-step:not(.scan-step-active) .scan-step-title { color: var(--ink); }
+        .scan-step-active .scan-step-title { color: white; }
+
+        .scan-step-desc {
+          font-size: 12px;
+          line-height: 1.65;
+          font-weight: 300;
+        }
+
+        .scan-step:not(.scan-step-active) .scan-step-desc { color: var(--stone); }
+        .scan-step-active .scan-step-desc { color: rgba(255,255,255,0.45); }
+
+        .scan-step-active .scan-step-num { color: var(--gold); }
+
+        @media (max-width: 768px) {
+          .scan-steps-grid { grid-template-columns: 1fr; }
+          .scan-step { border-right: none; border-bottom: 1px solid rgba(184,154,106,0.15); }
+          .scan-step:last-child { border-bottom: none; }
+        }
+
+        @media (max-width: 480px) {
+          .scanner-idle { padding: 40px 24px; }
+        }
       `}</style>
 
-      {/* Header */}
-      <div className="products-header">
-        <div>
-          <div className="page-eyebrow">Brand · Nike</div>
-          <h1 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,4vw,52px)", fontWeight:900, letterSpacing:"-0.03em", color:"var(--ink)", lineHeight:0.95 }}>
-            Products
+      <div className="scan-page">
+
+        {/* ── PAGE HEADER ── */}
+        <div className="scan-header">
+          <div className="scan-eyebrow">Verify Product</div>
+          <h1 className="scan-title">
+            Scan &amp; <em>confirm</em><br />authenticity.
           </h1>
-          <div style={{ fontSize:13, color:"var(--stone)", fontWeight:300, marginTop:8 }}>
-            {ALL_PRODUCTS.length} products registered · {ALL_PRODUCTS.filter(p=>p.status==="ACTIVE").length} active on-chain
-          </div>
+          <p className="scan-subtitle">
+            Point your camera at any Phygital QR code for instant blockchain-backed verification.
+          </p>
         </div>
-        <Link href="/product/add" className="btn btn-ink">
-          + Add Product <span className="btn-arr">↗</span>
-        </Link>
-      </div>
 
-      {/* Filter bar */}
-      <div className="filter-bar">
-        <div className="filter-tabs">
-          {(["ALL","ACTIVE","DRAFT","PENDING"] as Status[]).map(f => (
-            <button key={f} className={`filter-tab${filter===f?" active":""}`} onClick={() => setFilter(f)}>
-              {f === "ALL" ? `All (${ALL_PRODUCTS.length})` : `${f} (${ALL_PRODUCTS.filter(p=>p.status===f).length})`}
+        {/* ── SCANNER CARD ── */}
+        <div className="scanner-wrap">
+          <div className="scanner-card">
+
+            {/* Scanning active overlay indicator */}
+            {scanning && (
+              <div className="scanning-indicator">
+                <span className="scan-pulse" />
+                Scanning
+              </div>
+            )}
+
+            {/* QR Reader element — always in DOM */}
+            <div
+              id="qr-reader"
+              style={{ display: scanning ? "block" : "none" }}
+            />
+
+            {/* Idle state */}
+            {!scanning && (
+              <div className="scanner-idle">
+                <div className="scanner-idle-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="7" height="7"/>
+                    <rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/>
+                    <path d="M14 14h3v3h-3zM17 17h4v4h-4z"/>
+                  </svg>
+                </div>
+                <div className="scanner-idle-title">Ready to scan</div>
+                <p className="scanner-idle-sub">
+                  Grant camera access and point at a product's QR code to verify it instantly.
+                </p>
+                <button className="btn-scan-start" onClick={startScanning}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                  Start Scanning
+                </button>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div className="scan-error">
+                <div className="scan-error-dot" />
+                <div>
+                  <div className="scan-error-title">Scan Failed</div>
+                  <div className="scan-error-msg">{error}</div>
+                  {cameraPermission === "denied" && (
+                    <div className="scan-error-msg" style={{ marginTop: 6 }}>
+                      Go to browser Settings → Permissions → Camera → Allow
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Footer with stop button */}
+            {scanning && (
+              <div className="scanner-footer">
+                <span className="scanner-footer-label">Camera active</span>
+                <button className="btn-scan-stop" onClick={stopScanning}>
+                  Stop
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Manual entry */}
+          <div className="manual-entry">
+            <div className="manual-entry-label">Having trouble scanning?</div>
+            <button
+              className="btn-manual"
+              onClick={() => {
+                const productId = prompt("Enter Product ID:")
+                if (productId) router.push(`/verify/${productId}`)
+              }}
+            >
+              Enter Product ID manually
             </button>
-          ))}
+          </div>
         </div>
 
-        <div className="search-wrap">
-          <svg className="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input
-            className="search-input"
-            placeholder="Search products..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+        {/* ── HOW IT WORKS STEPS ── */}
+        <div className="scan-steps-section">
+          <div className="scan-steps-eyebrow">How it works</div>
+          <div className="scan-steps-grid">
+            {steps.map((s, i) => {
+              const active = step === i + 1
+              return (
+                <div key={s.n} className={`scan-step${active ? " scan-step-active" : ""}`}>
+                  <div className="scan-step-num">Step {s.n}</div>
+                  <div className="scan-step-icon">
+                    <div className="scan-step-icon-inner">{s.icon}</div>
+                  </div>
+                  <div className="scan-step-title">{s.t}</div>
+                  <div className="scan-step-desc">{s.d}</div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
 
-      <div className="products-body">
-        {/* Bulk action bar */}
-        {selected.length > 0 && (
-          <div className="bulk-bar">
-            <span style={{ color:"var(--stone)", fontWeight:400 }}>{selected.length} selected</span>
-            <button className="btn btn-ghost" style={{ padding:"6px 16px", fontSize:12 }} onClick={() => setSelected([])}>Clear</button>
-            <button className="btn btn-danger" style={{ padding:"6px 16px", fontSize:12 }}>Delete</button>
-          </div>
-        )}
-
-        {filtered.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round">
-                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-              </svg>
-            </div>
-            <div className="empty-title">No products found</div>
-            <div className="empty-sub">Try adjusting your filter or search term.</div>
-            <Link href="/product/add" className="btn btn-ink">Add First Product <span className="btn-arr">↗</span></Link>
-          </div>
-        ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th style={{ width:40 }}></th>
-                {["Product","Token","Scans","Status","Minted",""].map(h => <th key={h}>{h}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(p => (
-                <tr key={p.id}>
-                  <td>
-                    <div
-                      className={`checkbox${selected.includes(p.id)?" checked":""}`}
-                      onClick={() => toggleSelect(p.id)}
-                    >
-                      {selected.includes(p.id) && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="product-name-cell">{p.name}</div>
-                    <div className="product-sku">{p.sku}</div>
-                  </td>
-                  <td style={{ fontFamily:"monospace", fontSize:12 }}>{p.tokenId}</td>
-                  <td>
-                    {p.scans > 0 ? (
-                      <div>
-                        <div style={{ fontSize:13, fontWeight:500, marginBottom:4 }}>{p.scans.toLocaleString()}</div>
-                        <div className="scan-bar">
-                          <div className="scan-fill" style={{ width:`${Math.min(100, (p.scans/1500)*100)}%` }} />
-                        </div>
-                      </div>
-                    ) : <span style={{ color:"var(--stone)", fontSize:12 }}>—</span>}
-                  </td>
-                  <td>
-                    <span className={`badge ${p.status==="ACTIVE"?"badge-green":p.status==="PENDING"?"badge-gold":"badge-stone"}`}>
-                      <span className={`sdot ${p.status==="ACTIVE"?"sdot-green":p.status==="PENDING"?"sdot-gold":"sdot-stone"}`}/>
-                      {p.status}
-                    </span>
-                  </td>
-                  <td style={{ color:"var(--stone)", fontSize:12 }}>{p.minted}</td>
-                  <td>
-                    <div className="row-actions">
-                      <button className="row-action-btn">View</button>
-                      {p.status === "DRAFT" && <button className="row-action-btn" style={{ color:"var(--gold)", borderColor:"rgba(184,154,106,0.4)" }}>Mint</button>}
-                      <button className="row-action-btn">Edit</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
       </div>
     </>
-  );
+  )
 }

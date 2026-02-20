@@ -11,7 +11,7 @@ export default function Home() {
       {/* Global design tokens + shared utility classes */}
       <style>{globalStyles}</style>
 
-      <div style={{ background: "var(--cream)", paddingTop: 80 }}>
+      <div style={{ background: "var(--cream)" }}>
         <Hero />
         <StatsBar />
         <div className="section-divider" />
@@ -28,7 +28,7 @@ export default function Home() {
 export const globalStyles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=DM+Sans:wght@300;400;500&display=swap');
 
-  // *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } */
 
   :root {
     --cream: #F2EDE6;

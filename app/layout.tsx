@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="mt-20">
+      <body className="mt-20 bg-[#f2ede6]">
         <SessionProvider>
           <NavBar />
           {children}

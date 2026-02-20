@@ -5,9 +5,9 @@ function NavBar() {
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
-        { label: 'Verify Product', ariaLabel: 'Learn about us', link: '/dashboard' },
-        { label: 'For Brands', ariaLabel: 'View our services', link: '/dashboard' },
-        { label: 'How It Works', ariaLabel: 'Get in touch', link: '/contact' }
+        { label: 'Verify Product', ariaLabel: 'Verify a product', link: '/scanQr' },
+        { label: 'For Brands', ariaLabel: 'Brand registration', link: '/dashboard' },
+        { label: 'How It Works', ariaLabel: 'Learn how it works', link: '/contact' }
     ];
 
     const socialItems = [
@@ -17,9 +17,7 @@ function NavBar() {
     ];
 
     return (
-
-
-        <div style={{ height: '15vh',position: 'fixed', zIndex: 1000 }}>
+        <div style={{ height: '72px', position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000 }}>
             <StaggeredMenu
                 position="right"
                 isFixed={true}
@@ -30,9 +28,9 @@ function NavBar() {
                 menuButtonColor="#000000"
                 openMenuButtonColor="#000000"
                 changeMenuColorOnOpen={true}
-                colors={['#000870', '#67008e']}
+                colors={['#b89a6a', '#74716c']}
                 logoUrl="/assets/logo.png"
-                accentColor="#5227FF"
+                accentColor="#a27c49"
                 onMenuOpen={() => console.log('Menu opened')}
                 onMenuClose={() => console.log('Menu closed')}
             />

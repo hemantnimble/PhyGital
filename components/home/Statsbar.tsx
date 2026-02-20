@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function StatsBar() {
   const items = [
     "Authentic Products","Blockchain Verified","NFT Certificates",
@@ -26,7 +28,6 @@ export default function StatsBar() {
         .marquee-inner {
           display: flex;
           white-space: nowrap;
-          /* CSS scroll — no JS, no animation library */
           animation: ticker 22s linear infinite;
         }
 
@@ -113,13 +114,13 @@ export default function StatsBar() {
       {/* Stats */}
       <div className="stats-row">
         {stats.map((s, i) => (
-          <>
-            {i > 0 && <div key={`sep-${i}`} className="stat-sep" />}
-            <div key={s.n} className="stat-block">
+          <React.Fragment key={s.n}>
+            {i > 0 && <div className="stat-sep" />}
+            <div className="stat-block">
               <div className="stat-num">{s.n}</div>
               <div className="stat-label">{s.l}</div>
             </div>
-          </>
+          </React.Fragment>
         ))}
       </div>
     </>

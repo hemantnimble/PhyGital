@@ -11,7 +11,7 @@ export default function Hero() {
           overflow: hidden;
           display: flex;
           flex-direction: column;
-          padding-top: 100px;
+          padding-top: 50px;
         }
 
         .hero::before {
