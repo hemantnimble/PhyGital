@@ -1,10 +1,104 @@
-import HeroSec from '@/components/HeroSec';
+import BrandsFeature from "@/components/home/Brandsfeature";
+import CtaFooter from "@/components/home/Ctafooter";
+import Hero from "@/components/home/Hero";
+import HowItWorks from "@/components/home/Howitworks";
+import StatsBar from "@/components/home/Statsbar";
+import WhyBlockchain from "@/components/home/Whyblockchain";
 
 export default function Home() {
   return (
-    <main>
-      <HeroSec />
-      <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aut architecto sequi officiis ut! Qui repellat odit alias dolore deserunt. Minima doloremque, facere veritatis illum nam consectetur autem architecto praesentium doloribus ad assumenda impedit quam minus recusandae dolorem vel at dolor, aspernatur aliquam corporis voluptatibus porro accusantium cumque labore? Voluptate animi dolorem reprehenderit delectus rerum, ab consequuntur minus suscipit enim nihil, reiciendis vitae placeat eligendi nulla tenetur, laudantium nisi magni id. Modi eum voluptates assumenda cupiditate asperiores nulla? Aliquam minus soluta laboriosam, nulla modi ipsam quas hic non quibusdam neque facilis a natus pariatur placeat nihil odit nostrum reiciendis accusantium fugit quidem temporibus maiores necessitatibus libero maxime. Qui aperiam eius ratione accusantium provident consectetur molestiae officia necessitatibus minima ad odit delectus tempore enim laudantium voluptatibus, nam atque, praesentium eos quae vitae id. Cum dolorem est ea tempore molestiae nesciunt atque dolore soluta quasi similique, dicta laborum laudantium quidem deserunt et placeat fuga quaerat laboriosam. At dolor culpa, rerum molestiae non qui nobis, vitae consequuntur mollitia rem vero fugit consequatur voluptates. Nobis vel illum ratione soluta repellat voluptas aperiam labore. Necessitatibus aut perspiciatis in sequi veritatis alias, sed hic porro sint quibusdam, modi esse exercitationem dignissimos? Deleniti, dicta enim totam fugiat unde et aliquam non quam incidunt dignissimos quo cupiditate perferendis doloribus libero nam reiciendis odio explicabo consectetur iusto maiores pariatur. Ea repudiandae ducimus id, sit tenetur, sunt quibusdam maxime velit deleniti libero veniam similique molestiae reiciendis quae alias qui! Quae fugiat, beatae dolorum iusto atque doloremque aspernatur, ullam corporis aut, repellendus ea ex ad voluptates mollitia! Ipsum doloremque quasi, necessitatibus voluptate deserunt labore, dignissimos nam beatae maiores vitae blanditiis omnis consequuntur quam autem praesentium amet temporibus officiis adipisci odit at minus distinctio. Velit saepe quis at cum nobis consequatur dicta eaque accusantium minima! Dolorem iusto nobis nostrum distinctio numquam labore praesentium ipsum eum molestiae, fugiat corrupti assumenda sit sequi quae. Eum aperiam amet, voluptatibus quaerat vitae quos libero facilis voluptatem velit quibusdam necessitatibus quidem ad reprehenderit, iure fuga. Provident eligendi expedita aperiam veritatis, ad, dolores, nam fugiat nemo beatae praesentium sed ipsum hic accusamus neque amet! Cumque tempora itaque velit quod veniam eum dolore officiis eaque voluptatem ipsum nisi corporis, magnam, harum aperiam quibusdam tempore voluptatum aut voluptas possimus eius. Aperiam, quo. Sunt quibusdam explicabo ut dolores repellat natus quod voluptatem quisquam! Veritatis itaque dolore cumque, repellendus fugit quaerat omnis perspiciatis expedita impedit molestias voluptates doloremque natus unde magni vitae inventore aliquam iure officia, deleniti nemo eos vero facilis totam? Assumenda, adipisci libero. Magni debitis vel ab distinctio. Voluptatibus dolor neque excepturi totam assumenda laborum temporibus nam, non doloremque voluptatum, asperiores saepe sunt facere enim modi laudantium maiores porro culpa illo et veniam iusto? Animi, ex quisquam beatae exercitationem eos excepturi rem alias amet nisi aperiam tempora cumque officia magnam modi ipsam obcaecati quae tempore. Cum autem et ullam obcaecati quisquam ex ratione eveniet totam dolorum temporibus! Modi itaque quasi porro, voluptatem eius rem, aliquid a suscipit quis quas, rerum id labore doloribus quo vel enim nulla nam quisquam! Nesciunt repellat sed in ea? Perferendis consequatur pariatur est qui officiis iusto reiciendis, deserunt quaerat nostrum, delectus quisquam rerum magnam? Iusto eligendi perspiciatis atque consectetur voluptatem. Vero optio culpa ullam accusantium, provident numquam earum facilis fugit commodi ratione expedita a voluptas sapiente, laboriosam tempore aliquam saepe eius quas consequatur debitis. Iste ipsa nam fugit molestiae neque nostrum fuga placeat assumenda reiciendis. Architecto dicta atque facere, odit ad aliquam id eveniet cupiditate ea et reprehenderit doloremque aliquid quis dolore debitis nobis sit repellat unde fugit temporibus iure quam consequatur quia cumque. Magni omnis harum earum veniam deserunt, quaerat at, quo possimus optio facilis velit. Dignissimos a sint accusamus repellat quas nulla explicabo voluptate odio! Facilis, sunt vero odit esse cum magnam incidunt expedita eius, odio iusto sequi, a tempora blanditiis ea molestias quo voluptatem! Aspernatur soluta ipsam aliquid aperiam sed cum excepturi? Fuga vitae ullam natus exercitationem voluptatibus in voluptates harum corrupti voluptate accusantium. Ut saepe doloribus expedita harum et, laborum reiciendis cumque beatae magnam necessitatibus aliquid explicabo quibusdam repudiandae quas dolor commodi tempora veritatis minus alias quasi error pariatur eius deleniti similique. Omnis exercitationem beatae, eligendi, illo repudiandae saepe quibusdam, doloribus ducimus molestiae facilis tenetur? Adipisci ipsam, deserunt similique eaque quos repudiandae, unde maxime sequi facilis dolore magnam nisi itaque, velit vero perferendis nesciunt quam voluptas explicabo minus repellat ad. Non, voluptates asperiores. At voluptatem iure repellendus, quibusdam laboriosam unde ullam nulla cupiditate aut dolores dignissimos alias. Eum quod minima excepturi quaerat corporis velit, id sit laboriosam enim aliquam dignissimos exercitationem, sequi ex accusamus impedit ipsam provident, qui voluptatibus vel? Quibusdam saepe impedit iste veritatis commodi nulla earum dolore magnam sunt numquam? Libero obcaecati molestias cum adipisci amet molestiae sed sapiente? Temporibus eum, modi veritatis a consectetur, fuga fugiat quisquam hic veniam doloremque optio delectus cupiditate nemo repellat ullam eius vero enim rem tenetur soluta doloribus nesciunt accusantium exercitationem. Dignissimos, maxime, necessitatibus, ex modi quas odit eveniet minus eum cumque sunt officia deserunt! Possimus dolorem adipisci neque qui numquam illo rem voluptate vitae, tenetur ea sint doloribus explicabo harum. Suscipit rerum fugit nulla facere! Ea quae nihil maiores, vero error natus nobis possimus reiciendis, dignissimos quasi officiis voluptate modi culpa adipisci explicabo blanditiis quos esse aspernatur? Quae, modi veniam vero amet saepe aut! Temporibus officia non laboriosam magnam consequatur eligendi delectus aperiam deleniti, id aut modi nisi quisquam recusandae impedit consequuntur assumenda commodi, nihil, dicta exercitationem eum fuga maiores. Dolore porro nostrum harum, expedita omnis culpa accusantium natus sunt, dolorum ipsam cupiditate placeat doloremque aperiam ipsum consequuntur similique dolorem architecto facilis impedit tempora quam, recusandae mollitia eum! Repudiandae architecto tempore eius delectus sint deleniti harum esse, veniam officiis ipsam beatae ab amet molestias impedit dolores. Distinctio aperiam, nam inventore quibusdam reiciendis corrupti harum alias numquam eius dolorem iusto a mollitia ipsum similique magnam neque vitae accusantium. Tempora illum eaque facilis fugiat impedit corrupti cupiditate fuga? Rem et maiores beatae alias at officiis eveniet porro veniam, dicta quam voluptatibus voluptatum soluta eaque, aliquid, fuga tempore dignissimos maxime. Dignissimos ad assumenda nulla fugiat id?</p>
-    </main>
+     <>
+      {/* Global design tokens + shared utility classes */}
+      <style>{globalStyles}</style>
+
+      <div style={{ background: "var(--cream)", paddingTop: 80 }}>
+        <Hero />
+        <StatsBar />
+        <div className="section-divider" />
+        <BrandsFeature />
+        <WhyBlockchain />
+        <HowItWorks />
+        <CtaFooter />
+      </div>
+    </>
   );
 }
+
+
+export const globalStyles = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  // *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F2EDE6;
+    --ink: #0E0D0B;
+    --ink2: #1C1A17;
+    --gold: #B89A6A;
+    --gold-light: #D4B896;
+    --stone: #8C8378;
+    --glass-bg: rgba(242,237,230,0.55);
+    --glass-border: rgba(184,154,106,0.25);
+    --glass-dark: rgba(14,13,11,0.55);
+    --glass-dark-border: rgba(184,154,106,0.2);
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── SHARED BUTTONS ── */
+  .btn-primary {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 100px;
+    padding: 14px 30px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.01em;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-arrow {
+    width: 20px;
+    height: 20px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--stone);
+    border: 1px solid rgba(140,131,120,0.3);
+    border-radius: 100px;
+    padding: 14px 28px;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── SHARED DIVIDER ── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184,154,106,0.3), transparent);
+    margin: 0 5vw;
+  }
+`;
