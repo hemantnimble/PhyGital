@@ -61,7 +61,7 @@ export default function StatsBar() {
         .stats-row {
           display: flex;
           justify-content: center;
-          gap: clamp(48px, 8vw, 120px);
+          gap: clamp(48px, 1vw, 120px);
           padding: 64px 5vw;
           flex-wrap: wrap;
         }

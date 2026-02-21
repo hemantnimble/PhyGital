@@ -6,7 +6,7 @@ export default function Hero() {
       <style>{`
         .hero {
           background: var(--cream);
-          min-height: 100vh;
+          
           position: relative;
           overflow: hidden;
           display: flex;
@@ -76,7 +76,7 @@ export default function Hero() {
           display: block;
           font-family: 'Playfair Display', serif;
           font-weight: 900;
-          font-size: clamp(72px, 13vw, 200px);
+          font-size: clamp(72px, 12vw, 200px);
           letter-spacing: -0.03em;
           color: var(--ink);
           line-height: 0.87;
@@ -165,11 +165,11 @@ export default function Hero() {
         }
 
         @media (max-width: 600px) {
-          .display-line { font-size: clamp(44px, 14vw, 72px); }
+          .display-line { font-size: clamp(44px, 12vw, 72px); }
         }
       `}</style>
 
-      <section className="hero">
+      <section className="hero lg:min-h-screen">
         {/* Meta bar */}
         <div className="hero-meta">
           <span className="meta-tag">Blockchain Authentication</span>
@@ -184,36 +184,7 @@ export default function Hero() {
         <div className="title-wrap">
           <span className="display-line">AUTHENTICITY,</span>
           <span className="display-line outline italic">PERMANENTLY</span>
-          <span className="display-line">RECORDED.</span>
-
-          {/* Floating glass cards */}
-          <div className="glass-card card-top-left">
-            <div className="gc-label">Products Verified</div>
-            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,3vw,42px)", fontWeight:900, letterSpacing:"-0.04em", color:"var(--ink)" }}>12,000+</div>
-            <div className="gc-sub">across 340+ brands</div>
-          </div>
-
-          <div className="glass-card-dark card-mid-right">
-            <div className="gc-label-light">Blockchain Status</div>
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-              <div style={{ width:7, height:7, borderRadius:"50%", background:"#6DBE8C", boxShadow:"0 0 8px #6DBE8C" }} />
-              <span style={{ fontSize:13, fontWeight:500, color:"#6DBE8C", letterSpacing:"-0.01em" }}>Network Active</span>
-            </div>
-            <div className="gc-label-light" style={{ marginBottom:4 }}>Last Transaction</div>
-            <div style={{ fontFamily:"monospace", fontSize:10, color:"rgba(255,255,255,0.5)", letterSpacing:"0.05em" }}>0x4f3a1b2c...9e8f</div>
-          </div>
-
-          <div className="glass-card card-bottom-left">
-            <div className="gc-label">Ownership Transfer</div>
-            <div style={{ display:"flex", alignItems:"center", gap:8, margin:"8px 0" }}>
-              <div style={{ fontFamily:"monospace", fontSize:10, color:"var(--stone)", background:"rgba(14,13,11,0.06)", borderRadius:6, padding:"4px 8px" }}>0x1a2b...3c4d</div>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="2" strokeLinecap="round">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-              <div style={{ fontFamily:"monospace", fontSize:10, color:"var(--stone)", background:"rgba(14,13,11,0.06)", borderRadius:6, padding:"4px 8px" }}>0x9e8f...1a2b</div>
-            </div>
-            <div className="gc-sub">Verified on-chain · 2 min ago</div>
-          </div>
+          <span className="display-line">RECORDED.</span>   
         </div>
 
         {/* CTA Row */}
