@@ -111,7 +111,7 @@ export default function HowItWorks() {
         @media (max-width: 960px) { .process-steps { grid-template-columns: 1fr; } }
       `}</style>
 
-      <section className="process-section">
+      <section id="how-it-works" className="process-section">
         <div className="process-eyebrow">The Process</div>
         <h2 className="process-title">Three steps.<br /><em>Forever protected.</em></h2>
 

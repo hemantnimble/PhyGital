@@ -1,19 +1,43 @@
 'use client';
+import { useSession } from 'next-auth/react';
 import StaggeredMenu from '@/components/reactBits/nav';
 
 function NavBar() {
+    const { data: session } = useSession();
+
+    const role = session?.user?.role ?? [];
+    const isAdmin = role.includes('ADMIN');
+    const isBrand = role.includes('BRAND');
+    const isLoggedIn = !!session;
+
+    // "For Brands" logic:
+    // - Not logged in → /login (Google sign-in page or redirect to sign-in)
+    // - Logged in, not brand/admin → /brand/register
+    // - Brand or Admin → /dashboard
+    // Text changes to "Dashboard" when brand/admin
+    let brandsLink = '/brand/register';
+    let brandsLabel = 'For Brands';
+
+    if (!isLoggedIn) {
+        brandsLink = '/api/auth/signin';
+    } else if (isAdmin || isBrand) {
+        brandsLink = '/dashboard';
+        brandsLabel = 'Dashboard';
+    } else {
+        brandsLink = '/brand/register';
+    }
 
     const menuItems = [
         { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
         { label: 'Verify Product', ariaLabel: 'Verify a product', link: '/scanQr' },
-        { label: 'For Brands', ariaLabel: 'Brand registration', link: '/dashboard' },
-        { label: 'How It Works', ariaLabel: 'Learn how it works', link: '/contact' }
+        { label: brandsLabel, ariaLabel: 'Brand or dashboard', link: brandsLink },
+        { label: 'How It Works', ariaLabel: 'Learn how it works', link: '/#how-it-works' },
     ];
 
     const socialItems = [
         { label: 'Twitter', link: 'https://twitter.com' },
         { label: 'GitHub', link: 'https://github.com' },
-        { label: 'LinkedIn', link: 'https://linkedin.com' }
+        { label: 'LinkedIn', link: 'https://linkedin.com' },
     ];
 
     return (
@@ -35,7 +59,7 @@ function NavBar() {
                 onMenuClose={() => console.log('Menu closed')}
             />
         </div>
-    )
+    );
 }
 
-export default NavBar
+export default NavBar;
