@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import ImageUploader from "@/components/brand/ImageUploader"
 
 export default function AddProductPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<{ name: string; id: string } | null>(null)
   const [error, setError]     = useState<string | null>(null)
-  const [form, setForm]       = useState({ name:"", description:"", productCode:"", images:"" })
+  const [form, setForm]       = useState({ name:"", description:"", productCode:"" })
+  const [images, setImages]   = useState<string[]>([])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -25,7 +27,7 @@ export default function AddProductPage() {
           name:        form.name,
           description: form.description,
           productCode: form.productCode,
-          images:      form.images ? form.images.split(",").map(s => s.trim()).filter(Boolean) : [],
+          images,
         }),
       })
       const data = await res.json()
@@ -96,7 +98,7 @@ export default function AddProductPage() {
             <Link href="/brand/products" className="ap-btn-primary">
               View Products <span className="ap-btn-arr">↗</span>
             </Link>
-            <button className="ap-btn-ghost" onClick={() => { setSuccess(null); setForm({ name:"", description:"", productCode:"", images:"" }) }}>
+            <button className="ap-btn-ghost" onClick={() => { setSuccess(null); setForm({ name:"", description:"", productCode:"" }); setImages([]) }}>
               Add Another
             </button>
           </div>
@@ -112,7 +114,6 @@ export default function AddProductPage() {
         .ap-page { background:#F2EDE6; min-height:100vh; padding-top:80px; padding-bottom:64px; font-family:'DM Sans',sans-serif; }
         .ap-wrap { max-width:760px; margin:0 auto; padding:0 5vw; }
 
-        /* header */
         .ap-header { padding:36px 0 32px; border-bottom:1px solid rgba(184,154,106,0.18); margin-bottom:32px; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }
         .ap-eyebrow { font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#B89A6A; font-weight:400; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
         .ap-eyebrow::after { content:''; width:26px; height:1px; background:#B89A6A; }
@@ -121,11 +122,9 @@ export default function AddProductPage() {
         .ap-back { font-size:12px; color:#8C8378; text-decoration:none; display:flex; align-items:center; gap:5px; }
         .ap-back:hover { color:#0E0D0B; }
 
-        /* form layout */
         .ap-form-body { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
         .ap-form-full { grid-column:1/-1; }
 
-        /* field */
         .ap-field { display:flex; flex-direction:column; }
         .ap-label { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:#8C8378; font-weight:400; margin-bottom:7px; }
         .ap-label span { color:#B89A6A; }
@@ -138,15 +137,12 @@ export default function AddProductPage() {
         .ap-textarea:focus { border-color:#B89A6A; }
         .ap-hint { font-size:11px; color:rgba(140,131,120,0.55); margin-top:5px; line-height:1.5; }
 
-        /* divider */
         .ap-section-divider { height:1px; background:linear-gradient(90deg,rgba(184,154,106,0.2),transparent); margin:28px 0 24px; grid-column:1/-1; }
 
-        /* error */
         .ap-error { display:flex; gap:10px; align-items:flex-start; background:rgba(200,60,60,0.06); border:1px solid rgba(200,60,60,0.2); border-radius:10px; padding:12px 14px; grid-column:1/-1; }
         .ap-error-dot { width:7px; height:7px; border-radius:50%; background:#c04040; flex-shrink:0; margin-top:4px; }
         .ap-error-text { font-size:13px; color:#b83030; font-weight:300; line-height:1.5; }
 
-        /* submit row */
         .ap-submit-row { grid-column:1/-1; display:flex; align-items:center; gap:12px; padding-top:8px; }
         .ap-btn-submit { display:flex; align-items:center; gap:8px; background:#0E0D0B; color:#F2EDE6; border:none; border-radius:100px; padding:13px 28px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:opacity 0.2s; }
         .ap-btn-submit:hover:not(:disabled) { opacity:0.82; }
@@ -198,11 +194,10 @@ export default function AddProductPage() {
                 <span className="ap-hint">Unique identifier for this product. Used internally.</span>
               </div>
 
-              {/* Image URLs */}
-              <div className="ap-field">
-                <label className="ap-label">Image URLs <span className="ap-optional">optional</span></label>
-                <input name="images" className="ap-input" placeholder="https://... (comma separated)" value={form.images} onChange={handleChange} />
-                <span className="ap-hint">Separate multiple URLs with commas.</span>
+              {/* Images */}
+              <div className="ap-field ap-form-full" style={{ marginTop: 8 }}>
+                <label className="ap-label">Product Images <span className="ap-optional">optional</span></label>
+                <ImageUploader images={images} onChange={setImages} maxImages={5} />
               </div>
 
               {/* Submit */}

@@ -153,7 +153,6 @@ export default function ApplyBrandPage() {
         .br-page {
           background: #F2EDE6;
           min-height: 100vh;
-          padding-top: 88px;
           padding-bottom: 64px;
         }
 
