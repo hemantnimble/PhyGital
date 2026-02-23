@@ -35,7 +35,7 @@ export default async function BrandDashboardPage() {
     .bd-page {
       background: var(--cream);
       min-height: 100vh;
-      padding-top: 80px;
+      // padding-top: 80px;
       font-family: 'DM Sans', sans-serif;
     }
     .bd-wrap { max-width: 1020px; margin: 0 auto; padding: 0 5vw; }

@@ -111,7 +111,7 @@ export default function AddProductPage() {
   return (
     <>
       <style>{`
-        .ap-page { background:#F2EDE6; min-height:100vh; padding-top:80px; padding-bottom:64px; font-family:'DM Sans',sans-serif; }
+        .ap-page { background:#F2EDE6; min-height:100vh; padding-bottom:64px; font-family:'DM Sans',sans-serif; }
         .ap-wrap { max-width:760px; margin:0 auto; padding:0 5vw; }
 
         .ap-header { padding:36px 0 32px; border-bottom:1px solid rgba(184,154,106,0.18); margin-bottom:32px; display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; }

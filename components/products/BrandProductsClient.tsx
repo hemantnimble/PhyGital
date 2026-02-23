@@ -14,13 +14,13 @@ type Product = {
   nftCertificate?: NFTCertificate | null
   productCode?: string
 }
-type AlertState = { type: "success"|"error"|"warning"|"info"; title: string; message: string; action?: string }
+type AlertState = { type: "success" | "error" | "warning" | "info"; title: string; message: string; action?: string }
 
 /* ─── status helpers ─── */
 function statusColor(s: string) {
-  if (s === "ACTIVE")   return { bg:"rgba(109,190,140,0.1)", border:"rgba(109,190,140,0.3)", color:"#4a9e6c" }
-  if (s === "FLAGGED")  return { bg:"rgba(200,60,60,0.08)",  border:"rgba(200,60,60,0.25)",  color:"#b83030" }
-  return                       { bg:"rgba(184,154,106,0.1)", border:"rgba(184,154,106,0.3)", color:"#8a7055" }
+  if (s === "ACTIVE") return { bg: "rgba(109,190,140,0.1)", border: "rgba(109,190,140,0.3)", color: "#4a9e6c" }
+  if (s === "FLAGGED") return { bg: "rgba(200,60,60,0.08)", border: "rgba(200,60,60,0.25)", color: "#b83030" }
+  return { bg: "rgba(184,154,106,0.1)", border: "rgba(184,154,106,0.3)", color: "#8a7055" }
 }
 
 /* ═══════════════════════════════════════════
@@ -34,20 +34,22 @@ function QRModal({ productId, onClose }: { productId: string; onClose: () => voi
   }, [productId])
 
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(14,13,11,0.55)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:9999, padding:"0 5vw" }}>
-      <div style={{  borderRadius:24, padding:"32px 28px", maxWidth:340, width:"100%", position:"relative",
-        border:"1px solid rgba(184,154,106,0.25)",
-        background:"linear-gradient(150deg,rgba(255,255,255,0.9) 0%,rgba(242,237,230,0.7) 100%)" }}>
-        <div style={{ fontSize:9, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B89A6A", marginBottom:8 }}>QR Certificate</div>
-        <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color:"#0E0D0B", letterSpacing:"-0.02em", marginBottom:20, lineHeight:1.1 }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(14,13,11,0.55)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "0 5vw" }}>
+      <div style={{
+        borderRadius: 24, padding: "32px 28px", maxWidth: 340, width: "100%", position: "relative",
+        border: "1px solid rgba(184,154,106,0.25)",
+        background: "linear-gradient(150deg,rgba(255,255,255,0.9) 0%,rgba(242,237,230,0.7) 100%)"
+      }}>
+        <div style={{ fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#B89A6A", marginBottom: 8 }}>QR Certificate</div>
+        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 900, color: "#0E0D0B", letterSpacing: "-0.02em", marginBottom: 20, lineHeight: 1.1 }}>
           Scan to verify
         </div>
         {qr
-          ? <img src={qr} alt="QR Code" style={{ width:"100%", borderRadius:12, border:"1px solid rgba(184,154,106,0.2)" }} />
-          : <div style={{ width:"100%", aspectRatio:"1", background:"rgba(184,154,106,0.08)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"#B89A6A", fontSize:12 }}>Generating…</div>
+          ? <img src={qr} alt="QR Code" style={{ width: "100%", borderRadius: 12, border: "1px solid rgba(184,154,106,0.2)" }} />
+          : <div style={{ width: "100%", aspectRatio: "1", background: "rgba(184,154,106,0.08)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", color: "#B89A6A", fontSize: 12 }}>Generating…</div>
         }
-        <div style={{ marginTop:14, fontFamily:"monospace", fontSize:10, color:"#8C8378", wordBreak:"break-all", lineHeight:1.5 }}>{productId}</div>
-        <button onClick={onClose} style={{ marginTop:20, width:"100%", background:"#0E0D0B", color:"#F2EDE6", border:"none", borderRadius:100, padding:"12px 0", fontFamily:"'DM Sans',sans-serif", fontSize:13, fontWeight:500, cursor:"pointer" }}>
+        <div style={{ marginTop: 14, fontFamily: "monospace", fontSize: 10, color: "#8C8378", wordBreak: "break-all", lineHeight: 1.5 }}>{productId}</div>
+        <button onClick={onClose} style={{ marginTop: 20, width: "100%", background: "#0E0D0B", color: "#F2EDE6", border: "none", borderRadius: 100, padding: "12px 0", fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>
           Close
         </button>
       </div>
@@ -59,9 +61,9 @@ function QRModal({ productId, onClose }: { productId: string; onClose: () => voi
    EDIT MODAL
 ═══════════════════════════════════════════ */
 function EditModal({ product, onClose, onUpdated }: { product: Product; onClose: () => void; onUpdated: () => void }) {
-  const [name, setName]           = useState(product.name)
-  const [description, setDesc]    = useState(product.description || "")
-  const [loading, setLoading]     = useState(false)
+  const [name, setName] = useState(product.name)
+  const [description, setDesc] = useState(product.description || "")
+  const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -77,30 +79,30 @@ function EditModal({ product, onClose, onUpdated }: { product: Product; onClose:
   }
 
   return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(14,13,11,0.55)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:9999, padding:"0 5vw" }}>
-      <div style={{ background:"linear-gradient(150deg,rgba(255,255,255,0.96) 0%,rgba(242,237,230,0.85) 100%)", borderRadius:24, padding:"32px 28px", maxWidth:480, width:"100%", border:"1px solid rgba(184,154,106,0.25)" }}>
-        <div style={{ fontSize:9, letterSpacing:"0.2em", textTransform:"uppercase", color:"#B89A6A", marginBottom:8 }}>Editing</div>
-        <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:900, color:"#0E0D0B", letterSpacing:"-0.02em", marginBottom:24, lineHeight:1.1 }}>
+    <div style={{ position: "fixed", inset: 0, background: "rgba(14,13,11,0.55)", backdropFilter: "blur(6px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: "0 5vw" }}>
+      <div style={{ background: "linear-gradient(150deg,rgba(255,255,255,0.96) 0%,rgba(242,237,230,0.85) 100%)", borderRadius: 24, padding: "32px 28px", maxWidth: 480, width: "100%", border: "1px solid rgba(184,154,106,0.25)" }}>
+        <div style={{ fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", color: "#B89A6A", marginBottom: 8 }}>Editing</div>
+        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 900, color: "#0E0D0B", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.1 }}>
           {product.name}
         </div>
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom:16 }}>
-            <label style={{ fontSize:10, letterSpacing:"0.15em", textTransform:"uppercase", color:"#8C8378", display:"block", marginBottom:7 }}>Product Name <span style={{ color:"#B89A6A" }}>*</span></label>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#8C8378", display: "block", marginBottom: 7 }}>Product Name <span style={{ color: "#B89A6A" }}>*</span></label>
             <input value={name} onChange={e => setName(e.target.value)} required
-              style={{ width:"100%", background:"white", border:"1px solid rgba(184,154,106,0.25)", borderRadius:10, padding:"11px 14px", fontFamily:"'DM Sans',sans-serif", fontSize:13, color:"#0E0D0B", outline:"none", boxSizing:"border-box" }} />
+              style={{ width: "100%", background: "white", border: "1px solid rgba(184,154,106,0.25)", borderRadius: 10, padding: "11px 14px", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#0E0D0B", outline: "none", boxSizing: "border-box" }} />
           </div>
-          <div style={{ marginBottom:20 }}>
-            <label style={{ fontSize:10, letterSpacing:"0.15em", textTransform:"uppercase", color:"#8C8378", display:"block", marginBottom:7 }}>Description</label>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ fontSize: 10, letterSpacing: "0.15em", textTransform: "uppercase", color: "#8C8378", display: "block", marginBottom: 7 }}>Description</label>
             <textarea value={description} onChange={e => setDesc(e.target.value)} rows={3}
-              style={{ width:"100%", background:"white", border:"1px solid rgba(184,154,106,0.25)", borderRadius:10, padding:"11px 14px", fontFamily:"'DM Sans',sans-serif", fontSize:13, color:"#0E0D0B", outline:"none", boxSizing:"border-box", resize:"vertical", lineHeight:1.6 }} />
+              style={{ width: "100%", background: "white", border: "1px solid rgba(184,154,106,0.25)", borderRadius: 10, padding: "11px 14px", fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: "#0E0D0B", outline: "none", boxSizing: "border-box", resize: "vertical", lineHeight: 1.6 }} />
           </div>
-          <div style={{ display:"flex", gap:10 }}>
+          <div style={{ display: "flex", gap: 10 }}>
             <button type="submit" disabled={loading}
-              style={{ flex:1, background:"#0E0D0B", color:"#F2EDE6", border:"none", borderRadius:100, padding:"12px 0", fontFamily:"'DM Sans',sans-serif", fontSize:13, fontWeight:500, cursor:"pointer", opacity: loading ? 0.45 : 1 }}>
+              style={{ flex: 1, background: "#0E0D0B", color: "#F2EDE6", border: "none", borderRadius: 100, padding: "12px 0", fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 500, cursor: "pointer", opacity: loading ? 0.45 : 1 }}>
               {loading ? "Saving…" : "Save Changes"}
             </button>
             <button type="button" onClick={onClose}
-              style={{ background:"transparent", color:"#8C8378", border:"1px solid rgba(140,131,120,0.28)", borderRadius:100, padding:"12px 20px", fontFamily:"'DM Sans',sans-serif", fontSize:13, cursor:"pointer" }}>
+              style={{ background: "transparent", color: "#8C8378", border: "1px solid rgba(140,131,120,0.28)", borderRadius: 100, padding: "12px 20px", fontFamily: "'DM Sans',sans-serif", fontSize: 13, cursor: "pointer" }}>
               Cancel
             </button>
           </div>
@@ -114,18 +116,18 @@ function EditModal({ product, onClose, onUpdated }: { product: Product; onClose:
    MAIN COMPONENT
 ═══════════════════════════════════════════ */
 export default function BrandProductsClient() {
-  const [products, setProducts]   = useState<Product[]>([])
-  const [loading, setLoading]     = useState(true)
-  const [editing, setEditing]     = useState<Product | null>(null)
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState<Product | null>(null)
   const [qrProductId, setQrProductId] = useState<string | null>(null)
   const [mintingId, setMintingId] = useState<string | null>(null)
-  const [alert, setAlert]         = useState<AlertState | null>(null)
-  const [filter, setFilter]       = useState<"ALL"|"ACTIVE"|"DRAFT"|"FLAGGED">("ALL")
-  const [search, setSearch]       = useState("")
+  const [alert, setAlert] = useState<AlertState | null>(null)
+  const [filter, setFilter] = useState<"ALL" | "ACTIVE" | "DRAFT" | "FLAGGED">("ALL")
+  const [search, setSearch] = useState("")
 
   async function fetchProducts() {
     setLoading(true)
-    const res  = await fetch("/api/products/all")
+    const res = await fetch("/api/products/all")
     const data = await res.json()
     setProducts(Array.isArray(data) ? data : [])
     setLoading(false)
@@ -141,7 +143,7 @@ export default function BrandProductsClient() {
   })
 
   async function activateProduct(id: string) {
-    const res  = await fetch("/api/products/all", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ id, status:"ACTIVE" }) })
+    const res = await fetch("/api/products/all", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, status: "ACTIVE" }) })
     const data = await res.json()
     if (data.success) setQrProductId(id)
     fetchProducts()
@@ -149,45 +151,45 @@ export default function BrandProductsClient() {
 
   async function mintProduct(product: Product) {
     if (!product.brand?.walletAddress) {
-      setAlert({ type:"error", title:"Wallet Not Set", message:"Please set your wallet address before minting.", action:"Go to Settings → Enter your wallet address" })
+      setAlert({ type: "error", title: "Wallet Not Set", message: "Please set your wallet address before minting.", action: "Go to Settings → Enter your wallet address" })
       return
     }
     if (!confirm(`Mint NFT certificate for "${product.name}"?`)) return
     setMintingId(product.id)
     try {
-      const res  = await fetch("/api/mint", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ productId: product.id }) })
+      const res = await fetch("/api/mint", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId: product.id }) })
       const data = await res.json()
-      if (!res.ok) { setAlert({ type:"error", ...parseBlockchainError(data.error) }); setMintingId(null); return }
-      setAlert({ type:"success", title:"NFT Minted!", message:`Token #${data.tokenId} created successfully.`, action:`View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
+      if (!res.ok) { setAlert({ type: "error", ...parseBlockchainError(data.error) }); setMintingId(null); return }
+      setAlert({ type: "success", title: "NFT Minted!", message: `Token #${data.tokenId} created successfully.`, action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
       fetchProducts()
-    } catch (e: any) { setAlert({ type:"error", ...parseBlockchainError(e) }) }
+    } catch (e: any) { setAlert({ type: "error", ...parseBlockchainError(e) }) }
     setMintingId(null)
   }
 
   async function deleteProduct(id: string) {
     if (!confirm("Delete this product?")) return
     try {
-      const res  = await fetch("/api/products/all", { method:"DELETE", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ id }) })
+      const res = await fetch("/api/products/all", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
       const data = await res.json()
-      if (!res.ok) { setAlert({ type:"error", ...parseAPIError(data) }); return }
+      if (!res.ok) { setAlert({ type: "error", ...parseAPIError(data) }); return }
       setAlert(data.softDeleted
-        ? { type:"warning", title:"Product Flagged", message:"Active/minted products cannot be deleted. Status changed to FLAGGED." }
-        : { type:"success", title:"Product Deleted", message:"The product has been permanently removed." })
+        ? { type: "warning", title: "Product Flagged", message: "Active/minted products cannot be deleted. Status changed to FLAGGED." }
+        : { type: "success", title: "Product Deleted", message: "The product has been permanently removed." })
       fetchProducts()
-    } catch { setAlert({ type:"error", title:"Delete Failed", message:"Could not delete product. Please try again." }) }
+    } catch { setAlert({ type: "error", title: "Delete Failed", message: "Could not delete product. Please try again." }) }
   }
 
   const counts = {
     ALL: products.length,
-    ACTIVE:  products.filter(p => p.status === "ACTIVE").length,
-    DRAFT:   products.filter(p => p.status === "DRAFT").length,
+    ACTIVE: products.filter(p => p.status === "ACTIVE").length,
+    DRAFT: products.filter(p => p.status === "DRAFT").length,
     FLAGGED: products.filter(p => p.status === "FLAGGED").length,
   }
 
   return (
     <>
       <style>{`
-        .bp-page { background:#F2EDE6; min-height:100vh; padding-top:80px; padding-bottom:64px; font-family:'DM Sans',sans-serif; }
+        .bp-page { background:#F2EDE6; min-height:100vh; padding-bottom:64px; font-family:'DM Sans',sans-serif; }
         .bp-wrap { max-width:960px; margin:0 auto; padding:0 5vw; }
 
         /* ── HEADER ── */
@@ -273,9 +275,7 @@ export default function BrandProductsClient() {
       `}</style>
 
       {alert && (
-        <div style={{ position:"fixed", top:86, left:"50%", transform:"translateX(-50%)", width:"90%", maxWidth:520, zIndex:9998 }}>
-          <Alert type={alert.type} title={alert.title} message={alert.message} action={alert.action} onClose={() => setAlert(null)} autoClose={alert.type === "success" ? 5000 : 0} />
-        </div>
+        <Alert type={alert.type} title={alert.title} message={alert.message} action={alert.action} onClose={() => setAlert(null)} autoClose={alert.type === "success" ? 5000 : 0} />
       )}
 
       {editing && <EditModal product={editing} onClose={() => setEditing(null)} onUpdated={fetchProducts} />}
@@ -299,7 +299,7 @@ export default function BrandProductsClient() {
           {/* ── FILTER BAR ── */}
           <div className="bp-filters">
             <div className="bp-tabs">
-              {(["ALL","ACTIVE","DRAFT","FLAGGED"] as const).map(f => (
+              {(["ALL", "ACTIVE", "DRAFT", "FLAGGED"] as const).map(f => (
                 <button key={f} className={`bp-tab${filter === f ? " active" : ""}`} onClick={() => setFilter(f)}>
                   {f} ({counts[f]})
                 </button>
@@ -307,7 +307,7 @@ export default function BrandProductsClient() {
             </div>
             <div className="bp-search">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
               </svg>
               <input placeholder="Search products…" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
@@ -323,17 +323,17 @@ export default function BrandProductsClient() {
             <div className="bp-empty">
               <div className="bp-empty-icon">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
                 </svg>
               </div>
               <div className="bp-empty-title">{search ? "No results found" : "No products yet"}</div>
               <div className="bp-empty-sub">{search ? "Try a different search term." : "Register your first product to get started."}</div>
-              {!search && <a href="/product/add" className="bp-btn-add" style={{ display:"inline-flex" }}>Add Your First Product <span className="bp-btn-add-arr">↗</span></a>}
+              {!search && <a href="/product/add" className="bp-btn-add" style={{ display: "inline-flex" }}>Add Your First Product <span className="bp-btn-add-arr">↗</span></a>}
             </div>
           ) : (
             <div className="bp-list">
               {filtered.map(product => {
-                const sc  = statusColor(product.status)
+                const sc = statusColor(product.status)
                 const isMinting = mintingId === product.id
                 return (
                   <div key={product.id} className="bp-row">
@@ -341,8 +341,8 @@ export default function BrandProductsClient() {
                     {product.images?.[0]
                       ? <img src={product.images[0]} alt={product.name} className="bp-row-img" />
                       : <div className="bp-row-img-placeholder">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9l4-4 5 5 3-3 6 6"/></svg>
-                        </div>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2"><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M3 9l4-4 5 5 3-3 6 6" /></svg>
+                      </div>
                     }
 
                     {/* Info */}
@@ -350,8 +350,8 @@ export default function BrandProductsClient() {
                       <div className="bp-row-name">{product.name}</div>
                       {product.description && <div className="bp-row-desc">{product.description}</div>}
                       <div className="bp-row-badges">
-                        <span className="bp-badge" style={{ background:sc.bg, borderColor:sc.border, color:sc.color }}>
-                          <span className="bp-badge-dot" style={{ background:sc.color }} />
+                        <span className="bp-badge" style={{ background: sc.bg, borderColor: sc.border, color: sc.color }}>
+                          <span className="bp-badge-dot" style={{ background: sc.color }} />
                           {product.status}
                         </span>
                         {product.nftCertificate && (

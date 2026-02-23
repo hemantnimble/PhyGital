@@ -52,15 +52,15 @@ export default function VerifyPage() {
   const params = useParams()
   const productId = params.productId as string
 
-  const [product, setProduct]     = useState<Product | null>(null)
+  const [product, setProduct] = useState<Product | null>(null)
   const [blockchain, setBlockchain] = useState<BlockchainData | null>(null)
-  const [loading, setLoading]     = useState(true)
+  const [loading, setLoading] = useState(true)
 
-  const [claimWallet, setClaimWallet]           = useState("")
-  const [claiming, setClaiming]                 = useState(false)
+  const [claimWallet, setClaimWallet] = useState("")
+  const [claiming, setClaiming] = useState(false)
   const [transferFromWallet, setTransferFromWallet] = useState("")
-  const [transferToWallet, setTransferToWallet]   = useState("")
-  const [transferring, setTransferring]           = useState(false)
+  const [transferToWallet, setTransferToWallet] = useState("")
+  const [transferring, setTransferring] = useState(false)
 
   const [alert, setAlert] = useState<{
     type: "success" | "error" | "warning" | "info"
@@ -83,44 +83,44 @@ export default function VerifyPage() {
   async function handleClaim() {
     const network = await checkNetwork()
     if (!network.correct) {
-      setAlert({ type:"error", title:"Wrong Network", message:`You're on ${network.current}. Switch to ${network.expected}.`, action:"Click here to switch automatically" })
+      setAlert({ type: "error", title: "Wrong Network", message: `You're on ${network.current}. Switch to ${network.expected}.`, action: "Click here to switch automatically" })
       const switched = await switchToSepolia()
       if (!switched) return
     }
     if (!claimWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
-      setAlert({ type:"error", title:"Invalid Address", message:"Please enter a valid Ethereum wallet address.", action:"Format: 0x followed by 40 hex characters" })
+      setAlert({ type: "error", title: "Invalid Address", message: "Please enter a valid Ethereum wallet address.", action: "Format: 0x followed by 40 hex characters" })
       return
     }
     if (!confirm(`Claim ownership of "${product?.name}"?\n\nNFT will transfer to:\n${claimWallet}`)) return
     setClaiming(true)
     try {
-      const res  = await fetch("/api/claim", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ productId, newOwnerWallet: claimWallet }) })
+      const res = await fetch("/api/claim", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId, newOwnerWallet: claimWallet }) })
       const data = await res.json()
-      if (!res.ok) { setAlert({ type:"error", ...parseBlockchainError(data.error) }); setClaiming(false); return }
-      setAlert({ type:"success", title:"Ownership Claimed!", message:"The NFT has been transferred to your wallet.", action:`View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
+      if (!res.ok) { setAlert({ type: "error", ...parseBlockchainError(data.error) }); setClaiming(false); return }
+      setAlert({ type: "success", title: "Ownership Claimed!", message: "The NFT has been transferred to your wallet.", action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
       setTimeout(() => window.location.reload(), 3000)
-    } catch (e: any) { setAlert({ type:"error", ...parseBlockchainError(e) }); setClaiming(false) }
+    } catch (e: any) { setAlert({ type: "error", ...parseBlockchainError(e) }); setClaiming(false) }
   }
 
   /* ── TRANSFER ── */
   async function handleTransfer() {
     if (!transferFromWallet.match(/^0x[a-fA-F0-9]{40}$/) || !transferToWallet.match(/^0x[a-fA-F0-9]{40}$/)) {
-      setAlert({ type:"error", title:"Invalid Address", message:"Please enter valid Ethereum wallet addresses for both fields." })
+      setAlert({ type: "error", title: "Invalid Address", message: "Please enter valid Ethereum wallet addresses for both fields." })
       return
     }
     if (transferFromWallet.toLowerCase() === transferToWallet.toLowerCase()) {
-      setAlert({ type:"warning", title:"Same Address", message:"From and To wallets are the same. Please enter a different recipient." })
+      setAlert({ type: "warning", title: "Same Address", message: "From and To wallets are the same. Please enter a different recipient." })
       return
     }
     if (!confirm(`Transfer ownership to:\n${transferToWallet}`)) return
     setTransferring(true)
     try {
-      const res  = await fetch("/api/transfer", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ productId, fromWallet: transferFromWallet, toWallet: transferToWallet }) })
+      const res = await fetch("/api/transfer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId, fromWallet: transferFromWallet, toWallet: transferToWallet }) })
       const data = await res.json()
-      if (!res.ok) { setAlert({ type:"error", ...parseBlockchainError(data.error) }); setTransferring(false); return }
-      setAlert({ type:"success", title:"Ownership Transferred!", message:"The NFT has been transferred to the new owner.", action:`View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
+      if (!res.ok) { setAlert({ type: "error", ...parseBlockchainError(data.error) }); setTransferring(false); return }
+      setAlert({ type: "success", title: "Ownership Transferred!", message: "The NFT has been transferred to the new owner.", action: `View on Etherscan: https://sepolia.etherscan.io/tx/${data.txHash}` })
       setTimeout(() => window.location.reload(), 3000)
-    } catch (e: any) { setAlert({ type:"error", ...parseBlockchainError(e) }); setTransferring(false) }
+    } catch (e: any) { setAlert({ type: "error", ...parseBlockchainError(e) }); setTransferring(false) }
   }
 
   /* ────────────────── LOADING ────────────────── */
@@ -149,7 +149,7 @@ export default function VerifyPage() {
         .vp-404-link { font-family:'DM Sans',sans-serif; font-size:13px; color:#B89A6A; text-decoration:underline; text-underline-offset:3px; }
       `}</style>
       <div className="vp-404">
-        <div className="vp-404-title">Product<br /><span style={{fontStyle:"italic",color:"transparent",WebkitTextStroke:"1.5px rgba(14,13,11,0.22)"}}>not found.</span></div>
+        <div className="vp-404-title">Product<br /><span style={{ fontStyle: "italic", color: "transparent", WebkitTextStroke: "1.5px rgba(14,13,11,0.22)" }}>not found.</span></div>
         <p className="vp-404-sub">This product doesn't exist or hasn't been registered on Phygital.</p>
         <Link href="/scanQr" className="vp-404-link">← Back to scanner</Link>
       </div>
@@ -157,7 +157,7 @@ export default function VerifyPage() {
   )
 
   const isClaimed = blockchain?.currentOwner?.toLowerCase() !== product.brand.walletAddress?.toLowerCase()
-  const canClaim  = blockchain?.isAuthentic && !isClaimed
+  const canClaim = blockchain?.isAuthentic && !isClaimed
 
   /* ────────────────── MAIN PAGE ────────────────── */
   return (
@@ -167,8 +167,7 @@ export default function VerifyPage() {
         .vp { background:#F2EDE6; min-height:100vh; padding-top:96px; padding-bottom:100px; }
         .vp-wrap { max-width:760px; margin:0 auto; padding:0 5vw; }
 
-        /* ── ALERT FIXED ── */
-        .vp-alert { position:fixed; top:86px; left:50%; transform:translateX(-50%); width:90%; max-width:520px; z-index:9999; }
+        
 
         /* ────────── HERO STRIP ────────── */
         .vp-hero { padding-bottom:56px; border-bottom:1px solid rgba(184,154,106,0.2); margin-bottom:56px; }
@@ -456,9 +455,7 @@ export default function VerifyPage() {
       <div className="vp">
         {/* Alert */}
         {alert && (
-          <div className="vp-alert">
-            <Alert type={alert.type} title={alert.title} message={alert.message} action={alert.action} onClose={() => setAlert(null)} autoClose={alert.type === "success" ? 5000 : 0} />
-          </div>
+          <Alert type={alert.type} title={alert.title} message={alert.message} action={alert.action} onClose={() => setAlert(null)} autoClose={alert.type === "success" ? 5000 : 0} />
         )}
 
         <div className="vp-wrap">
@@ -495,9 +492,9 @@ export default function VerifyPage() {
             ) : (
               <div className="vp-product-img-placeholder">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                  <rect x="3" y="3" width="18" height="18" rx="3"/>
-                  <path d="M3 9l4-4 5 5 3-3 6 6"/>
-                  <circle cx="8.5" cy="7.5" r="1.5"/>
+                  <rect x="3" y="3" width="18" height="18" rx="3" />
+                  <path d="M3 9l4-4 5 5 3-3 6 6" />
+                  <circle cx="8.5" cy="7.5" r="1.5" />
                 </svg>
               </div>
             )}
