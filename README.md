@@ -198,4 +198,8 @@ Make sure all environment variables are set in your Vercel project settings.
 
 ## 📜 License
 
+<<<<<<< HEAD
 MIT © 2026 Phygital
+=======
+MIT © 2026 Phygital
+>>>>>>> 75bbf9cb96f0613d69694cc3eb5ff5de8fb3359f
