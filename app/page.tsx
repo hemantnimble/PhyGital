@@ -8,7 +8,6 @@ import WhyBlockchain from "@/components/home/Whyblockchain";
 export default function Home() {
   return (
      <>
-      {/* Global design tokens + shared utility classes */}
       <style>{globalStyles}</style>
 
       <div style={{ background: "var(--cream)" }}>

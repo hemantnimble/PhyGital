@@ -19,7 +19,6 @@ export async function POST(req: Request) {
     include: { verification: true },
   })
 
-  // 🟢 CASE 1: RE-APPLY (brand exists but rejected)
   if (
     existingBrand &&
     existingBrand.verification?.status === "REJECTED"
@@ -51,7 +50,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, reapply: true })
   }
 
-  // 🔴 CASE 2: Brand already applied or approved
   if (existingBrand) {
     return NextResponse.json(
       { error: "Brand already exists" },
@@ -59,7 +57,6 @@ export async function POST(req: Request) {
     )
   }
 
-  // 🆕 CASE 3: First-time apply
   const brand = await db.brand.create({
     data: {
       name: body.name,

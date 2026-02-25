@@ -1,12 +1,15 @@
-import Link from "next/link";
+"use client"
+
+import Link from "next/link"
+import { useState } from "react"
 
 export default function Hero() {
+
   return (
     <>
       <style>{`
         .hero {
           background: var(--cream);
-          
           position: relative;
           overflow: hidden;
           display: flex;
@@ -90,54 +93,6 @@ export default function Hero() {
 
         .display-line.italic { font-style: italic; }
 
-        /* ── FLOATING GLASS CARDS ── */
-        .glass-card {
-          background: var(--glass-bg);
-          border: 1px solid var(--glass-border);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border-radius: 20px;
-          padding: 20px 24px;
-          position: absolute;
-          z-index: 10;
-        }
-
-        .glass-card-dark {
-          background: var(--glass-dark);
-          border: 1px solid var(--glass-dark-border);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border-radius: 20px;
-          padding: 20px 24px;
-          position: absolute;
-          z-index: 10;
-          color: white;
-        }
-
-        .gc-label {
-          font-size: 9px;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--stone);
-          margin-bottom: 8px;
-          font-weight: 400;
-        }
-
-        .gc-label-light {
-          font-size: 9px;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: rgba(255,255,255,0.35);
-          margin-bottom: 8px;
-          font-weight: 400;
-        }
-
-        .gc-sub { font-size: 11px; color: var(--stone); margin-top: 4px; }
-
-        .card-top-left   { top: 5%;   left: 3vw;  width: clamp(180px, 16vw, 240px); }
-        .card-mid-right  { top: 40%;  right: 3vw; width: clamp(190px, 17vw, 250px); }
-        .card-bottom-left{ bottom: 14%; left: 3vw; width: clamp(200px, 18vw, 270px); }
-
         /* ── HERO CTA ROW ── */
         .hero-cta-row {
           display: flex;
@@ -158,7 +113,45 @@ export default function Hero() {
           font-weight: 300;
         }
 
-        .cta-group { display: flex; align-items: center; gap: 16px; }
+        .cta-group {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        /* ── TRY DEMO BUTTON ── */
+        .btn-demo {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: transparent;
+          color: var(--stone);
+          border: 1px solid rgba(140,131,120,0.3);
+          border-radius: 100px;
+          padding: 14px 24px;
+          font-size: 13px;
+          font-weight: 400;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+          transition: all 0.2s;
+          position: relative;
+        }
+        .btn-demo:hover {
+          border-color: rgba(184,154,106,0.5);
+          color: var(--ink);
+        }
+        .btn-demo-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: #6DBE8C;
+          box-shadow: 0 0 0 2px rgba(109,190,140,0.25);
+          animation: hero-pulse 2s ease-in-out infinite;
+        }
+        @keyframes hero-pulse {
+          0%, 100% { box-shadow: 0 0 0 2px rgba(109,190,140,0.25); }
+          50% { box-shadow: 0 0 0 4px rgba(109,190,140,0.15); }
+        }
 
         @media (max-width: 960px) {
           .card-top-left, .card-mid-right, .card-bottom-left { display: none; }
@@ -166,6 +159,8 @@ export default function Hero() {
 
         @media (max-width: 600px) {
           .display-line { font-size: clamp(44px, 12vw, 72px); }
+          .cta-group { width: 100%; }
+          .btn-demo, .btn-ghost { flex: 1; justify-content: center; }
         }
       `}</style>
 
@@ -180,11 +175,11 @@ export default function Hero() {
           <span className="meta-tag">Est. 2026</span>
         </div>
 
-        {/* Giant title — no word breaks, no mockups */}
+        {/* Giant title */}
         <div className="title-wrap">
           <span className="display-line">AUTHENTICITY,</span>
           <span className="display-line outline italic">PERMANENTLY</span>
-          <span className="display-line">RECORDED.</span>   
+          <span className="display-line">RECORDED.</span>
         </div>
 
         {/* CTA Row */}
@@ -200,9 +195,10 @@ export default function Hero() {
             <Link href="/brand/register" className="btn-ghost">
               Register Your Brand
             </Link>
+            
           </div>
         </div>
       </section>
     </>
-  );
+  )
 }

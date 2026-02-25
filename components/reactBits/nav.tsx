@@ -5,6 +5,7 @@ import RippleButton from '../RippleButton';
 import { login } from '@/actions/auth';
 import { signOut, useSession } from 'next-auth/react';
 import Link from 'next/link';
+import DemoModal from "@/components/DemoModal"
 
 
 export interface StaggeredMenuItem {
@@ -78,6 +79,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const busyRef = useRef(false);
 
     const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
+  const [showDemo, setShowDemo] = useState(false)
 
     useLayoutEffect(() => {
         const ctx = gsap.context(() => {
@@ -437,6 +439,13 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         </Link>
                     </div>
                     <div className='flex'>
+                        {/* Demo Modal */}
+                        {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
+                        {/* ── TRY DEMO BUTTON ── */}
+                        <button className="bg-[#a27c49] py-1 px-3.5 rounded-2xl mr-1.5" onClick={() => setShowDemo(true)}>
+                            <span className="" />
+                            Try Demo Login
+                        </button>
                         <div className='mr-5'>
                             {session.data ? (
                                 <RippleButton onClick={() => signOut()}>Logout</RippleButton>
