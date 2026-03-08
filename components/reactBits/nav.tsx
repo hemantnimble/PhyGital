@@ -446,12 +446,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                         {session.data ? (
                              <button className="bg-[#a27c49] py-1 px-3.5 rounded-2xl mr-1.5">
                                 <span className="" />
-                                Demo Logged In
+                                Demo
                             </button>
                         ) : (
                             <button className="bg-[#a27c49] py-1 px-3.5 rounded-2xl mr-1.5" onClick={() => setShowDemo(true)}>
                                 <span className="" />
-                                Try Demo Login
+                               Demo
                             </button>
                         )}
 
